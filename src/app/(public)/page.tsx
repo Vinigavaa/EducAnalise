@@ -1,0 +1,17 @@
+import Header from "./_components/header";
+import { Hero } from "./_components/hero";
+import { Features } from "./_components/features";
+import { Testimonials } from "./_components/testimonials";
+
+export default function Home (){
+    return(
+        <div className="flex flex-col min-h-screen">
+            <Header/>
+            <div>
+                <Hero/>
+                <Features/>
+                <Testimonials/>
+            </div>
+        </div>
+    )
+}

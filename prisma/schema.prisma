@@ -1,0 +1,176 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Turma {
+  id          String     @id @default(uuid())
+  nome        String
+  ano_letivo  Int
+  alunos      Aluno[]
+  provas      Prova[]
+  userId      String?    @map("user_id")
+  user        User?      @relation(fields: [userId], references: [id])
+
+  criado_em     DateTime @default(now())
+  atualizado_em DateTime @updatedAt
+}
+
+model Aluno {
+  id         String   @id @default(uuid())
+  nome       String
+  turmaId    String   @map("turma_id")
+  turma      Turma    @relation(fields: [turmaId], references: [id])
+  notas      Nota[]
+
+  criado_em     DateTime @default(now())
+  atualizado_em DateTime @updatedAt
+}
+
+model Materia {
+  id         String        @id @default(uuid())
+  nome       String        @unique
+  provas     ProvaMateria[]
+  notas      Nota[]
+  userId     String?       @map("user_id")
+  user       User?         @relation(fields: [userId], references: [id])
+
+  criado_em     DateTime @default(now())
+  atualizado_em DateTime @updatedAt
+}
+
+enum TipoProva {
+  COMUM
+  SIMULADO
+}
+
+model Prova {
+  id           String        @id @default(uuid())
+  nome         String
+  turmaId      String        @map("turma_id")
+  turma        Turma         @relation(fields: [turmaId], references: [id])
+  ano_letivo   Int
+  peso         Decimal       @db.Decimal(5,2)
+  tipo         TipoProva
+  data_prova   DateTime?
+  userId       String?       @map("user_id")
+  user         User?         @relation(fields: [userId], references: [id])
+
+  materias     ProvaMateria[]
+  notas        Nota[]
+
+  criado_em     DateTime @default(now())
+  atualizado_em DateTime @updatedAt
+}
+
+model ProvaMateria {
+  id         String   @id @default(uuid())
+  provaId    String   @map("prova_id")
+  materiaId  String   @map("materia_id")
+
+  prova      Prova    @relation(fields: [provaId], references: [id], onDelete: Cascade)
+  materia    Materia  @relation(fields: [materiaId], references: [id])
+
+  @@unique([provaId, materiaId])
+}
+
+model Nota {
+  id          String    @id @default(uuid())
+  alunoId     String    @map("aluno_id")
+  provaId     String    @map("prova_id")
+  materiaId   String?   @map("materia_id")
+  valor_nota  Decimal   @db.Decimal(5,2)
+  data_lancada DateTime @default(now())
+
+  aluno     Aluno    @relation(fields: [alunoId], references: [id])
+  prova     Prova    @relation(fields: [provaId], references: [id])
+  materia   Materia? @relation(fields: [materiaId], references: [id])
+
+  criado_em     DateTime @default(now())
+  atualizado_em DateTime @updatedAt
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  status        Boolean?   @default(true)
+  stripe_customer_id String?
+  subscription  Subscription?
+  accounts      Account[]
+  sessions      Session[]
+  turmas        Turma[]
+  materias      Materia[]
+  provas        Prova[]
+
+  @@map("users")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String  @map("user_id")
+  type              String
+  provider          String
+  providerAccountId String  @map("provider_account_id")
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+ 
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+enum Plan {
+  BASIC
+  PROFESSIONAL
+}
+
+model Subscription{
+  id String @id @default(uuid())
+  status String
+  plan Plan
+  priceId String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt
+  userId String @unique
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique @map("session_token")
+  userId       String   @map("user_id")
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+ 
+  @@map("sessions")
+}
