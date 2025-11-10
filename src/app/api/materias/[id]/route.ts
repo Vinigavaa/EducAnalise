@@ -1,21 +1,15 @@
-import { auth } from "@/lib/auth";
+import { withAuth } from "@/lib/auth-helper";
 import prisma from "@/lib/prisma";
 import { updateMateriaSchema } from "@/lib/validations/materia";
 import { NextRequest, NextResponse } from "next/server";
 import z from "zod";
 
-export async function GET(request: NextRequest, props: {params: Promise<{id: string}>}){
+export const GET = withAuth(async (_request: NextRequest, userId: string, props: {params: Promise<{id: string}>}) => {
     const params = await props.params;
 
     try{
-        const session = await auth();
-
-        if(!session || session.user?.id){
-            return NextResponse.json( {error: "Não Autorizado"}, {status: 401})
-        }
-
         const materia = await prisma.materia.findFirst({
-            where: {id: params.id, userId: session.user.id}
+            where: {id: params.id, userId}
         })
 
         if(!materia){
@@ -27,37 +21,28 @@ export async function GET(request: NextRequest, props: {params: Promise<{id: str
 
         return NextResponse.json(materia, { status: 200 });
     } catch(error){
-        console.error("Erro ao buscar materia:", error);
+        console.error("Erro ao buscar matéria:", error);
         return NextResponse.json(
-        { error: "Erro ao buscar materia" },
-        { status: 500 }
+            { error: "Erro ao buscar matéria" },
+            { status: 500 }
         );
     }
-}
+});
 
-export async function PUT(request: NextRequest, props: {params: Promise<{id: string}>}){
+export const PUT = withAuth(async (request: NextRequest, userId: string, props: {params: Promise<{id: string}>}) => {
     const params = await props.params;
 
     try{
-        const session = await auth();
-
-        if(!session || session.user?.id){
-            return NextResponse.json(
-                {error: "Não Autorizado"},
-                {status: 401}
-            )
-        }
-
         const materiaExistente = await prisma.materia.findFirst({
             where: {
                 id: params.id,
-                userId: session.user.id,
+                userId,
             },
         })
 
         if(!materiaExistente){
             return NextResponse.json(
-                {error: "Essa prova não existe"},
+                {error: "Essa matéria não existe"},
                 {status: 404}
             )
         }
@@ -92,4 +77,41 @@ export async function PUT(request: NextRequest, props: {params: Promise<{id: str
             {status: 500}
         );
     }
-}
+});
+
+export const DELETE = withAuth(async (_request: NextRequest, userId: string, props: {params: Promise<{id: string}>}) => {
+    const params = await props.params;
+
+    try {
+        const materia = await prisma.materia.findFirst({
+            where: {
+                id: params.id,
+                userId,
+            },
+        });
+
+        if (!materia) {
+            return NextResponse.json(
+                { error: "Matéria não encontrada" },
+                { status: 404 }
+            );
+        }
+
+        await prisma.materia.delete({
+            where: {
+                id: params.id,
+            },
+        });
+
+        return NextResponse.json(
+            { message: "Matéria deletada com sucesso" },
+            { status: 200 }
+        );
+    } catch (error) {
+        console.error("Erro ao deletar matéria:", error);
+        return NextResponse.json(
+            { error: "Erro ao deletar matéria" },
+            { status: 500 }
+        );
+    }
+});

@@ -1,32 +1,21 @@
-
-
-
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { withAuth } from "@/lib/auth-helper";
 import prisma from "@/lib/prisma";
 import { updateTurmaSchema } from "@/lib/validations/turma";
 import { z } from "zod";
 
 // GET /api/turmas/[id] - Buscar uma turma específica
-export async function GET(
-  request: NextRequest,
+export const GET = withAuth(async (
+  _request: NextRequest,
+  userId: string,
   props: { params: Promise<{ id: string }> }
-) {
+) => {
   const params = await props.params;
   try {
-    const session = await auth();
-
-    if (!session || !session.user?.id) {
-      return NextResponse.json(
-        { error: "Não autorizado" },
-        { status: 401 }
-      );
-    }
-
     const turma = await prisma.turma.findFirst({
       where: {
         id: params.id,
-        userId: session.user.id,
+        userId,
       },
       include: {
         alunos: {
@@ -58,29 +47,21 @@ export async function GET(
       { status: 500 }
     );
   }
-}
+});
 
 // PUT /api/turmas/[id] - Atualizar uma turma
-export async function PUT(
+export const PUT = withAuth(async (
   request: NextRequest,
+  userId: string,
   props: { params: Promise<{ id: string }> }
-) {
+) => {
   const params = await props.params;
   try {
-    const session = await auth();
-
-    if (!session || !session.user?.id) {
-      return NextResponse.json(
-        { error: "Não autorizado" },
-        { status: 401 }
-      );
-    }
-
     // Verificar se a turma pertence ao usuário
     const turmaExistente = await prisma.turma.findFirst({
       where: {
         id: params.id,
-        userId: session.user.id,
+        userId,
       },
     });
 
@@ -128,29 +109,21 @@ export async function PUT(
       { status: 500 }
     );
   }
-}
+});
 
 // DELETE /api/turmas/[id] - Excluir uma turma
-export async function DELETE(
-  request: NextRequest,
+export const DELETE = withAuth(async (
+  _request: NextRequest,
+  userId: string,
   props: { params: Promise<{ id: string }> }
-) {
+) => {
   const params = await props.params;
   try {
-    const session = await auth();
-
-    if (!session || !session.user?.id) {
-      return NextResponse.json(
-        { error: "Não autorizado" },
-        { status: 401 }
-      );
-    }
-
     // Verificar se a turma pertence ao usuário
     const turmaExistente = await prisma.turma.findFirst({
       where: {
         id: params.id,
-        userId: session.user.id,
+        userId,
       },
       include: {
         _count: {
@@ -189,4 +162,4 @@ export async function DELETE(
       { status: 500 }
     );
   }
-}
+});

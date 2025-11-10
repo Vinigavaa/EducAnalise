@@ -1,24 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { withAuth } from "@/lib/auth-helper";
 import prisma from "@/lib/prisma";
 import { createTurmaSchema } from "@/lib/validations/turma";
 import { z } from "zod";
 
 // GET /api/turmas - Listar todas as turmas do usuário autenticado
-export async function GET(request: NextRequest) {
+export const GET = withAuth(async (_request: NextRequest, userId: string) => {
   try {
-    const session = await auth();
-
-    if (!session || !session.user?.id) {
-      return NextResponse.json(
-        { error: "Não autorizado" },
-        { status: 401 }
-      );
-    }
-
     const turmas = await prisma.turma.findMany({
       where: {
-        userId: session.user.id,
+        userId,
       },
       include: {
         _count: {
@@ -40,20 +31,11 @@ export async function GET(request: NextRequest) {
       { status: 500 }
     );
   }
-}
+});
 
 // POST /api/turmas - Criar nova turma
-export async function POST(request: NextRequest) {
+export const POST = withAuth(async (request: NextRequest, userId: string) => {
   try {
-    const session = await auth();
-
-    if (!session || !session.user?.id) {
-      return NextResponse.json(
-        { error: "Não autorizado" },
-        { status: 401 }
-      );
-    }
-
     const body = await request.json();
 
     // Validar dados com Zod
@@ -63,7 +45,7 @@ export async function POST(request: NextRequest) {
       data: {
         nome: validatedData.nome,
         ano_letivo: validatedData.ano_letivo,
-        userId: session.user.id,
+        userId,
       },
       include: {
         _count: {
@@ -89,4 +71,4 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
-}
+});

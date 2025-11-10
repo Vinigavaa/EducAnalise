@@ -1,47 +1,29 @@
-import { auth } from "@/lib/auth";
+import { withAuth } from "@/lib/auth-helper";
 import prisma from "@/lib/prisma";
 import { createMateriaSchema } from "@/lib/validations/materia";
 import { NextRequest, NextResponse } from "next/server";
 import z from "zod";
 
-export async function GET(request: NextRequest) {
+export const GET = withAuth(async (request: NextRequest, userId: string) => {
     try {
-        const session = await auth();
-
-        if (!session || !session.user?.id) {
-            return NextResponse.json(
-                { error: "Não autorizado" },
-                { status: 401 }
-            );
-        }
-
         const materias = await prisma.materia.findMany({
             where: {
-                userId: session.user.id,
+                userId,
             }
         })
 
         return NextResponse.json(materias, { status: 200 });
     } catch (error) {
-        console.error("Erro ao buscar turmas:", error);
+        console.error("Erro ao buscar matérias:", error);
         return NextResponse.json(
-            { error: "Erro ao buscar turmas" },
+            { error: "Erro ao buscar matérias" },
             { status: 500 }
         );
     }
-}
+});
 
-export async function POST(request: NextRequest) {
+export const POST = withAuth(async (request: NextRequest, userId: string) => {
     try {
-        const session = await auth();
-
-        if (!session || !session.user?.id) {
-            return NextResponse.json(
-                { error: "Não Autorizado" },
-                { status: 401 }
-            );
-        }
-
         const body = await request.json();
 
         const validatedData = createMateriaSchema.parse(body);
@@ -49,7 +31,7 @@ export async function POST(request: NextRequest) {
         const NovaMateria = await prisma.materia.create({
             data: {
                 nome: validatedData.nome,
-                userId: session.user.id
+                userId
             }
         })
 
@@ -63,10 +45,10 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        console.error("Erro ao criar turma:", error);
+        console.error("Erro ao criar matéria:", error);
         return NextResponse.json(
-            { error: "Erro ao criar turma" },
+            { error: "Erro ao criar matéria" },
             { status: 500 }
         );
     }
-}
+});

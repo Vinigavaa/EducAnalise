@@ -1,30 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { withAuth } from "@/lib/auth-helper";
 import prisma from "@/lib/prisma";
 import { updateProvaSchema } from "@/lib/validations/prova";
 import { z } from "zod";
 
 // GET /api/provas/[id] - Buscar uma prova específica
-export async function GET(
-  request: NextRequest,
+export const GET = withAuth(async (
+  _request: NextRequest,
+  userId: string,
   props: { params: Promise<{ id: string }> }
-) {
+) => {
   const params = await props.params;
   try {
-    const session = await auth();
-
-    if (!session || !session.user?.id) {
-      return NextResponse.json(
-        { error: "Não autorizado" },
-        { status: 401 }
-      );
-    }
-
     const prova = await prisma.prova.findFirst({
       where: {
         id: params.id,
         turma: {
-          userId: session.user.id,
+          userId,
         },
       },
       include: {
@@ -79,30 +71,22 @@ export async function GET(
       { status: 500 }
     );
   }
-}
+});
 
 // PUT /api/provas/[id] - Atualizar uma prova
-export async function PUT(
+export const PUT = withAuth(async (
   request: NextRequest,
+  userId: string,
   props: { params: Promise<{ id: string }> }
-) {
+) => {
   const params = await props.params;
   try {
-    const session = await auth();
-
-    if (!session || !session.user?.id) {
-      return NextResponse.json(
-        { error: "Não autorizado" },
-        { status: 401 }
-      );
-    }
-
     // Verificar se a prova existe e pertence a uma turma do usuário
     const provaExistente = await prisma.prova.findFirst({
       where: {
         id: params.id,
         turma: {
-          userId: session.user.id,
+          userId,
         },
       },
     });
@@ -129,7 +113,7 @@ export async function PUT(
       const turma = await prisma.turma.findFirst({
         where: {
           id: validatedData.turmaId,
-          userId: session.user.id,
+          userId,
         },
       });
 
@@ -184,30 +168,22 @@ export async function PUT(
       { status: 500 }
     );
   }
-}
+});
 
 // DELETE /api/provas/[id] - Excluir uma prova
-export async function DELETE(
-  request: NextRequest,
+export const DELETE = withAuth(async (
+  _request: NextRequest,
+  userId: string,
   props: { params: Promise<{ id: string }> }
-) {
+) => {
   const params = await props.params;
   try {
-    const session = await auth();
-
-    if (!session || !session.user?.id) {
-      return NextResponse.json(
-        { error: "Não autorizado" },
-        { status: 401 }
-      );
-    }
-
     // Verificar se a prova existe e pertence a uma turma do usuário
     const provaExistente = await prisma.prova.findFirst({
       where: {
         id: params.id,
         turma: {
-          userId: session.user.id,
+          userId,
         },
       },
       include: {
@@ -247,4 +223,4 @@ export async function DELETE(
       { status: 500 }
     );
   }
-}
+});

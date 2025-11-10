@@ -1,21 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { withAuth } from "@/lib/auth-helper";
 import prisma from "@/lib/prisma";
 import { createAlunoSchema } from "@/lib/validations/aluno";
 import { z } from "zod";
 
 // GET /api/alunos - Listar todos os alunos (opcionalmente filtrar por turma)
-export async function GET(request: NextRequest) {
+export const GET = withAuth(async (request: NextRequest, userId: string) => {
   try {
-    const session = await auth();
-
-    if (!session || !session.user?.id) {
-      return NextResponse.json(
-        { error: "Não autorizado" },
-        { status: 401 }
-      );
-    }
-
     const { searchParams } = new URL(request.url);
     const turmaId = searchParams.get("turmaId");
 
@@ -24,7 +15,7 @@ export async function GET(request: NextRequest) {
       const turma = await prisma.turma.findFirst({
         where: {
           id: turmaId,
-          userId: session.user.id,
+          userId,
         },
       });
 
@@ -60,7 +51,7 @@ export async function GET(request: NextRequest) {
     const alunos = await prisma.aluno.findMany({
       where: {
         turma: {
-          userId: session.user.id,
+          userId,
         },
       },
       include: {
@@ -85,20 +76,11 @@ export async function GET(request: NextRequest) {
       { status: 500 }
     );
   }
-}
+});
 
 // POST /api/alunos - Criar novo aluno
-export async function POST(request: NextRequest) {
+export const POST = withAuth(async (request: NextRequest, userId: string) => {
   try {
-    const session = await auth();
-
-    if (!session || !session.user?.id) {
-      return NextResponse.json(
-        { error: "Não autorizado" },
-        { status: 401 }
-      );
-    }
-
     const body = await request.json();
 
     // Validar dados com Zod
@@ -108,7 +90,7 @@ export async function POST(request: NextRequest) {
     const turma = await prisma.turma.findFirst({
       where: {
         id: validatedData.turmaId,
-        userId: session.user.id,
+        userId,
       },
     });
 
@@ -150,4 +132,4 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
-}
+});
