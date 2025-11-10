@@ -63,18 +63,11 @@ export async function GET(request: NextRequest) {
 
     // Listar todas as provas das turmas do usuário
     const provas = await prisma.prova.findMany({
-      where: {
-        turma: {
-          userId: session.user.id,
-        },
-      },
+      where: { 
+        turma: { userId: session.user.id,},},
       include: {
         turma: {
-          select: {
-            id: true,
-            nome: true,
-            ano_letivo: true,
-          },
+          select: { id: true, nome: true, ano_letivo: true },
         },
         _count: {
           select: {

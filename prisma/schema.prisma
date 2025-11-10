@@ -41,11 +41,10 @@ model Aluno {
 model Materia {
   id         String        @id @default(uuid())
   nome       String        @unique
-  provas     ProvaMateria[]
-  notas      Nota[]
+  provaId     String    @map("prova_id")
   userId     String?       @map("user_id")
   user       User?         @relation(fields: [userId], references: [id])
-
+  prova     Prova    @relation(fields: [provaId], references: [id])
   criado_em     DateTime @default(now())
   atualizado_em DateTime @updatedAt
 }
@@ -66,36 +65,22 @@ model Prova {
   data_prova   DateTime?
   userId       String?       @map("user_id")
   user         User?         @relation(fields: [userId], references: [id])
-
-  materias     ProvaMateria[]
+  materia     Materia[]
   notas        Nota[]
 
   criado_em     DateTime @default(now())
   atualizado_em DateTime @updatedAt
 }
 
-model ProvaMateria {
-  id         String   @id @default(uuid())
-  provaId    String   @map("prova_id")
-  materiaId  String   @map("materia_id")
-
-  prova      Prova    @relation(fields: [provaId], references: [id], onDelete: Cascade)
-  materia    Materia  @relation(fields: [materiaId], references: [id])
-
-  @@unique([provaId, materiaId])
-}
-
 model Nota {
   id          String    @id @default(uuid())
   alunoId     String    @map("aluno_id")
   provaId     String    @map("prova_id")
-  materiaId   String?   @map("materia_id")
   valor_nota  Decimal   @db.Decimal(5,2)
   data_lancada DateTime @default(now())
 
   aluno     Aluno    @relation(fields: [alunoId], references: [id])
   prova     Prova    @relation(fields: [provaId], references: [id])
-  materia   Materia? @relation(fields: [materiaId], references: [id])
 
   criado_em     DateTime @default(now())
   atualizado_em DateTime @updatedAt
