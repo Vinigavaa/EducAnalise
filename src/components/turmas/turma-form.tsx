@@ -39,6 +39,7 @@ export function TurmaForm({ turma, onSuccess }: TurmaFormProps) {
 
   const isEditing = !!turma;
 
+  //com o useform to dizendo o tipo dos dados do formulario
   const form = useForm<TurmaInput>({
     resolver: zodResolver(turmaSchema),
     defaultValues: {

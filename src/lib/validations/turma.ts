@@ -16,6 +16,7 @@ export const createTurmaSchema = turmaSchema;
 
 export const updateTurmaSchema = turmaSchema.partial();
 
+//define um tipo typescript estatico para o schema "z.infer"
 export type TurmaInput = z.infer<typeof turmaSchema>;
 export type CreateTurmaInput = z.infer<typeof createTurmaSchema>;
 export type UpdateTurmaInput = z.infer<typeof updateTurmaSchema>;
