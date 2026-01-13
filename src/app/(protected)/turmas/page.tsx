@@ -30,7 +30,7 @@ export default async function TurmasPage() {
   });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pt-15">
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold text-zinc-800">Minhas Turmas</h1>

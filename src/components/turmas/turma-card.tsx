@@ -39,7 +39,7 @@ export function TurmaCard({ turma }: TurmaCardProps) {
       </CardContent>
       <CardFooter className="gap-2 pt-3">
         <Button asChild variant="outline" className="flex-1">
-          <Link href={`/turmas/${turma.id}`}>Ver Detalhes</Link>
+          <Link href={`/turmas/${turma.id}`}>Adicionar Alunos</Link>
         </Button>
         <Button asChild className="flex-1">
           <Link href={`/turmas/${turma.id}/editar`}>Editar</Link>

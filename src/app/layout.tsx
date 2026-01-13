@@ -31,9 +31,7 @@ export default function RootLayout({
       >
         <SessionAuthProvider>
           <Header />
-          <div className="pt-20">
-            {children}
-          </div>
+          {children}
         </SessionAuthProvider>
       </body>
     </html>
