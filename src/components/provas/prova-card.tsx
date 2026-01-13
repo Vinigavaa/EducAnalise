@@ -58,6 +58,9 @@ export function ProvaCard({ prova }: ProvaCardProps) {
         <Button asChild variant="outline" className="flex-1">
           <Link href={`/provas/${prova.id}`}>Ver Detalhes</Link>
         </Button>
+        <Button asChild variant="outline" className="flex-1">
+          <Link href={`/provas/${prova.id}/notas`}>Lançar Notas</Link>
+        </Button>
         <Button asChild className="flex-1">
           <Link href={`/provas/${prova.id}/editar`}>Editar</Link>
         </Button>
