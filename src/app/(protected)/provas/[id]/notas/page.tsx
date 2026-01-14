@@ -52,6 +52,8 @@ export default async function ProvaNotasPage({ params }: ProvaNotasProps) {
         };
     });
 
+    const pesoProva = prova.peso;
+
     return (
         <div className="container mx-auto py-6 space-y-6 pt-15">
             <div>
@@ -64,6 +66,7 @@ export default async function ProvaNotasPage({ params }: ProvaNotasProps) {
             <LancarNotasForm
                 provaId={prova.id}
                 alunos={alunosComNotas}
+                pesoProva={pesoProva}
             />
         </div>
     );
