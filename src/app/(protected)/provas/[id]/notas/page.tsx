@@ -52,7 +52,7 @@ export default async function ProvaNotasPage({ params }: ProvaNotasProps) {
         };
     });
 
-    const pesoProva = prova.peso;
+    const pesoProva = prova.peso.toNumber();
 
     return (
         <div className="container mx-auto py-6 space-y-6 pt-15">

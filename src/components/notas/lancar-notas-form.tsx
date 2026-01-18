@@ -6,8 +6,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { User, Save } from "lucide-react";
-import { Decimal } from "@prisma/client/runtime/library";
-
 interface Aluno {
   id: string;
   nome: string;
@@ -17,7 +15,7 @@ interface Aluno {
 interface LancarNotasFormProps {
   provaId: string;
   alunos: Aluno[];
-  pesoProva: Decimal;
+  pesoProva: number;
 }
 
 export function LancarNotasForm({ provaId, alunos, pesoProva }: LancarNotasFormProps) {
@@ -30,7 +28,7 @@ export function LancarNotasForm({ provaId, alunos, pesoProva }: LancarNotasFormP
 
   const handleNotaChange = (alunoId: string, valor: string) => {
     const valorLimpo = valor.replace(/[^0-9.,]/g, "").replace(",", ".");
-    if (valorLimpo === "" || (Number(valorLimpo) >= 0 && Number(valorLimpo) <= pesoProva.toNumber())) {
+    if (valorLimpo === "" || (Number(valorLimpo) >= 0 && Number(valorLimpo) <= pesoProva)) {
       setNotas((prev) => ({ ...prev, [alunoId]: valorLimpo }));
     }
   };
