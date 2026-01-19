@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { withAuth } from "@/lib/auth-helper";
 import prisma from "@/lib/prisma";
-import { updateProvaSchema } from "@/lib/validations/prova";
+import { provaSchema } from "@/lib/validations/prova";
 import { z } from "zod";
+import { TipoProva } from "@/generated/prisma/enums";
 
 // GET /api/provas/[id] - Buscar uma prova específica
 export const GET = withAuth(async (
@@ -27,6 +28,21 @@ export const GET = withAuth(async (
             ano_letivo: true,
           },
         },
+        simuladoMaterias: {
+          include: {
+            materia: {
+              select: {
+                id: true,
+                nome: true,
+              },
+            },
+          },
+          orderBy: {
+            materia: {
+              nome: "asc",
+            },
+          },
+        },
         notas: {
           include: {
             aluno: {
@@ -35,10 +51,14 @@ export const GET = withAuth(async (
                 nome: true,
               },
             },
-            materia: {
-              select: {
-                id: true,
-                nome: true,
+            simuladoMateria: {
+              include: {
+                materia: {
+                  select: {
+                    id: true,
+                    nome: true,
+                  },
+                },
               },
             },
           },
@@ -106,7 +126,7 @@ export const PUT = withAuth(async (
     }
 
     // Validar dados com Zod
-    const validatedData = updateProvaSchema.parse(body);
+    const validatedData = provaSchema.partial().parse(body);
 
     // Se turmaId for fornecido, verificar se a nova turma pertence ao usuário
     if (validatedData.turmaId) {
@@ -125,32 +145,96 @@ export const PUT = withAuth(async (
       }
     }
 
-    const provaAtualizada = await prisma.prova.update({
-      where: {
-        id: params.id,
-      },
-      data: {
-        ...(validatedData.nome && { nome: validatedData.nome }),
-        ...(validatedData.turmaId && { turmaId: validatedData.turmaId }),
-        ...(validatedData.ano_letivo !== undefined && { ano_letivo: validatedData.ano_letivo }),
-        ...(validatedData.peso !== undefined && { peso: validatedData.peso }),
-        ...(validatedData.tipo && { tipo: validatedData.tipo }),
-        ...(validatedData.data_prova !== undefined && { data_prova: validatedData.data_prova }),
-      },
-      include: {
-        turma: {
-          select: {
-            id: true,
-            nome: true,
-            ano_letivo: true,
+    // Validar matérias para simulado
+    if (validatedData.tipo === TipoProva.SIMULADO) {
+      if (!validatedData.materias || validatedData.materias.length === 0) {
+        return NextResponse.json(
+          { error: "Simulados devem ter pelo menos uma matéria" },
+          { status: 400 }
+        );
+      }
+
+      // Verificar se todas as matérias existem e pertencem ao usuário
+      const materiasIds = validatedData.materias.map((m) => m.materiaId);
+      const materiasExistentes = await prisma.materia.findMany({
+        where: {
+          id: { in: materiasIds },
+          userId,
+        },
+      });
+
+      if (materiasExistentes.length !== materiasIds.length) {
+        return NextResponse.json(
+          { error: "Uma ou mais matérias não foram encontradas" },
+          { status: 404 }
+        );
+      }
+    }
+
+    // Usar transação para atualizar prova e matérias do simulado
+    const provaAtualizada = await prisma.$transaction(async (tx) => {
+      // Se for simulado e tem matérias, atualizar as matérias
+      if (validatedData.tipo === TipoProva.SIMULADO && validatedData.materias) {
+        // Deletar matérias antigas
+        await tx.simuladoMateria.deleteMany({
+          where: { provaId: params.id },
+        });
+
+        // Criar novas matérias
+        await tx.simuladoMateria.createMany({
+          data: validatedData.materias.map((m) => ({
+            provaId: params.id,
+            materiaId: m.materiaId,
+            peso: m.peso,
+          })),
+        });
+      }
+
+      // Se mudou de simulado para comum, deletar matérias
+      if (validatedData.tipo === TipoProva.COMUM && provaExistente.tipo === TipoProva.SIMULADO) {
+        await tx.simuladoMateria.deleteMany({
+          where: { provaId: params.id },
+        });
+      }
+
+      // Atualizar a prova
+      return tx.prova.update({
+        where: {
+          id: params.id,
+        },
+        data: {
+          ...(validatedData.nome && { nome: validatedData.nome }),
+          ...(validatedData.turmaId && { turmaId: validatedData.turmaId }),
+          ...(validatedData.ano_letivo !== undefined && { ano_letivo: validatedData.ano_letivo }),
+          ...(validatedData.peso !== undefined && { peso: validatedData.peso }),
+          ...(validatedData.tipo && { tipo: validatedData.tipo }),
+          ...(validatedData.data_prova !== undefined && { data_prova: validatedData.data_prova }),
+        },
+        include: {
+          turma: {
+            select: {
+              id: true,
+              nome: true,
+              ano_letivo: true,
+            },
+          },
+          simuladoMaterias: {
+            include: {
+              materia: {
+                select: {
+                  id: true,
+                  nome: true,
+                },
+              },
+            },
+          },
+          _count: {
+            select: {
+              notas: true,
+            },
           },
         },
-        _count: {
-          select: {
-            notas: true,
-          },
-        },
-      },
+      });
     });
 
     return NextResponse.json(provaAtualizada, { status: 200 });

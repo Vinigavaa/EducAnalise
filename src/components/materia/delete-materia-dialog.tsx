@@ -39,7 +39,7 @@ export function DeleteMateriaDialog({materiaId, nome}: DeleteMateriaDialogProps)
 
             router.push("/materias");
             router.refresh();
-        } catch(error){
+        } catch {
             alert("Erro ao excluir matéria. Tente novamente.");
         } finally {
             setIsDeleting(false);
@@ -58,7 +58,7 @@ export function DeleteMateriaDialog({materiaId, nome}: DeleteMateriaDialogProps)
                 <AlertDialogHeader>
                     <AlertDialogTitle>Tem certeza?</AlertDialogTitle>
                     <AlertDialogDescription>
-                        Essa ação não pode ser desfeita. Isso irá excluir a matéria <strong>"{nome}"</strong> permanentemente.
+                        Essa ação não pode ser desfeita. Isso irá excluir a matéria <strong>&quot;{nome}&quot;</strong> permanentemente.
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>

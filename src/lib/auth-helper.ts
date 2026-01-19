@@ -1,6 +1,7 @@
 import { auth } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
 type Handler = (
   request: NextRequest,
   userId: string,
@@ -21,3 +22,4 @@ export function withAuth(handler: Handler) {
     return handler(request, session.user.id, ...args);
   };
 }
+/* eslint-enable @typescript-eslint/no-explicit-any */

@@ -39,14 +39,15 @@ model Aluno {
 }
 
 model Materia {
-  id         String        @id @default(uuid())
-  nome       String        @unique
-  provaId     String    @map("prova_id")
-  userId     String?       @map("user_id")
-  user       User?         @relation(fields: [userId], references: [id])
-  prova     Prova    @relation(fields: [provaId], references: [id])
-  criado_em     DateTime @default(now())
-  atualizado_em DateTime @updatedAt
+  id                String              @id @default(uuid())
+  nome              String
+  userId            String?             @map("user_id")
+  user              User?               @relation(fields: [userId], references: [id])
+  simuladoMaterias  SimuladoMateria[]
+  criado_em         DateTime            @default(now())
+  atualizado_em     DateTime            @updatedAt
+
+  @@unique([nome, userId])
 }
 
 enum TipoProva {
@@ -54,33 +55,52 @@ enum TipoProva {
   SIMULADO
 }
 
+model SimuladoMateria {
+  id        String   @id @default(uuid())
+  provaId   String   @map("prova_id")
+  materiaId String   @map("materia_id")
+  peso      Decimal  @db.Decimal(5, 2)
+
+  prova     Prova    @relation(fields: [provaId], references: [id], onDelete: Cascade)
+  materia   Materia  @relation(fields: [materiaId], references: [id], onDelete: Cascade)
+  notas     Nota[]
+
+  criado_em     DateTime @default(now())
+  atualizado_em DateTime @updatedAt
+
+  @@unique([provaId, materiaId])
+  @@map("simulado_materia")
+}
+
 model Prova {
-  id           String        @id @default(uuid())
-  nome         String
-  turmaId      String        @map("turma_id")
-  turma        Turma         @relation(fields: [turmaId], references: [id])
-  ano_letivo   Int
-  peso         Decimal       @db.Decimal(5,2)
-  tipo         TipoProva
-  data_prova   DateTime?
-  userId       String?       @map("user_id")
-  user         User?         @relation(fields: [userId], references: [id])
-  materia     Materia[]
-  notas        Nota[]
+  id                String              @id @default(uuid())
+  nome              String
+  turmaId           String              @map("turma_id")
+  turma             Turma               @relation(fields: [turmaId], references: [id])
+  ano_letivo        Int
+  peso              Decimal             @db.Decimal(5, 2)
+  tipo              TipoProva
+  data_prova        DateTime?
+  userId            String?             @map("user_id")
+  user              User?               @relation(fields: [userId], references: [id])
+  simuladoMaterias  SimuladoMateria[]
+  notas             Nota[]
 
   criado_em     DateTime @default(now())
   atualizado_em DateTime @updatedAt
 }
 
 model Nota {
-  id          String    @id @default(uuid())
-  alunoId     String    @map("aluno_id")
-  provaId     String    @map("prova_id")
-  valor_nota  Decimal   @db.Decimal(5,2)
-  data_lancada DateTime @default(now())
+  id                  String            @id @default(uuid())
+  alunoId             String            @map("aluno_id")
+  provaId             String            @map("prova_id")
+  simuladoMateriaId   String?           @map("simulado_materia_id")
+  valor_nota          Decimal           @db.Decimal(5, 2)
+  data_lancada        DateTime          @default(now())
 
-  aluno     Aluno    @relation(fields: [alunoId], references: [id])
-  prova     Prova    @relation(fields: [provaId], references: [id])
+  aluno             Aluno             @relation(fields: [alunoId], references: [id])
+  prova             Prova             @relation(fields: [provaId], references: [id])
+  simuladoMateria   SimuladoMateria?  @relation(fields: [simuladoMateriaId], references: [id], onDelete: Cascade)
 
   criado_em     DateTime @default(now())
   atualizado_em DateTime @updatedAt

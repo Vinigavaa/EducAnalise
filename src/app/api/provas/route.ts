@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { withAuth } from "@/lib/auth-helper";
 import prisma from "@/lib/prisma";
-import { createProvaSchema } from "@/lib/validations/prova";
+import { provaSchema } from "@/lib/validations/prova";
 import { z } from "zod";
+import { TipoProva } from "@/generated/prisma/enums";
 
 // GET /api/provas - Listar todas as provas (opcionalmente filtrar por turma)
 export const GET = withAuth(async (request: NextRequest, userId: string) => {
@@ -93,7 +94,7 @@ export const POST = withAuth(async (request: NextRequest, userId: string) => {
     }
 
     // Validar dados com Zod
-    const validatedData = createProvaSchema.parse(body);
+    const validatedData = provaSchema.parse(body);
 
     // Verificar se a turma existe e pertence ao usuário
     const turma = await prisma.turma.findFirst({
@@ -110,6 +111,33 @@ export const POST = withAuth(async (request: NextRequest, userId: string) => {
       );
     }
 
+    // Validar matérias para simulado
+    if (validatedData.tipo === TipoProva.SIMULADO) {
+      if (!validatedData.materias || validatedData.materias.length === 0) {
+        return NextResponse.json(
+          { error: "Simulados devem ter pelo menos uma matéria" },
+          { status: 400 }
+        );
+      }
+
+      // Verificar se todas as matérias existem e pertencem ao usuário
+      const materiasIds = validatedData.materias.map((m) => m.materiaId);
+      const materiasExistentes = await prisma.materia.findMany({
+        where: {
+          id: { in: materiasIds },
+          userId,
+        },
+      });
+
+      if (materiasExistentes.length !== materiasIds.length) {
+        return NextResponse.json(
+          { error: "Uma ou mais matérias não foram encontradas" },
+          { status: 404 }
+        );
+      }
+    }
+
+    // Criar prova com matérias do simulado (se aplicável)
     const novaProva = await prisma.prova.create({
       data: {
         nome: validatedData.nome,
@@ -118,6 +146,16 @@ export const POST = withAuth(async (request: NextRequest, userId: string) => {
         peso: validatedData.peso,
         tipo: validatedData.tipo,
         data_prova: validatedData.data_prova,
+        userId,
+        // Criar matérias do simulado se for simulado
+        ...(validatedData.tipo === TipoProva.SIMULADO && validatedData.materias && {
+          simuladoMaterias: {
+            create: validatedData.materias.map((m) => ({
+              materiaId: m.materiaId,
+              peso: m.peso,
+            })),
+          },
+        }),
       },
       include: {
         turma: {
@@ -125,6 +163,16 @@ export const POST = withAuth(async (request: NextRequest, userId: string) => {
             id: true,
             nome: true,
             ano_letivo: true,
+          },
+        },
+        simuladoMaterias: {
+          include: {
+            materia: {
+              select: {
+                id: true,
+                nome: true,
+              },
+            },
           },
         },
         _count: {

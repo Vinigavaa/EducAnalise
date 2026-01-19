@@ -36,10 +36,14 @@ export const GET = withAuth(async (
                 data_prova: true,
               },
             },
-            materia: {
-              select: {
-                id: true,
-                nome: true,
+            simuladoMateria: {
+              include: {
+                materia: {
+                  select: {
+                    id: true,
+                    nome: true,
+                  },
+                },
               },
             },
           },
