@@ -45,7 +45,7 @@ export default async function TurmaPage(props: TurmaPageProps) {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pt-15">
       {/* Header dentro do "ver detalhes" */}
       <div className="flex items-start justify-between">
         <div className="space-y-1">
