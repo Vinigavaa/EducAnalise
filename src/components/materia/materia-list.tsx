@@ -9,7 +9,7 @@ interface MateriaListaProps {
     materias: Materia[];
 }
 
-export function MateriaList({materias}: MateriaListaProps) {
+export function MateriaList({materias = []}: MateriaListaProps) {
  if(materias.length === 0){
     return(
         <div className="text-center py-12">

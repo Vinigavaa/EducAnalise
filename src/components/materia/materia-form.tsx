@@ -4,8 +4,8 @@ import { MateriaInput, materiaSchema } from "@/lib/validations/materia";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Form, useForm } from "react-hook-form";
-import { FormControl, FormField, FormItem, FormLabel } from "../ui/form";
+import { useForm } from "react-hook-form";
+import { Form, FormControl, FormField, FormItem, FormLabel } from "../ui/form";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 
@@ -37,7 +37,7 @@ export function MateriaForm({ materia, OnSucess }: MateriaFormProps) {
         setError(null);
 
         try {
-            const url = isEditing ? `/api/materias/${materia.id}` : "api/materias";
+            const url = isEditing ? `/api/materias/${materia.id}` : "/api/materias";
             const method = isEditing ? "PUT" : "POST";
 
             const response = await fetch(url, { //fetch é um método do JavaScript usado para fazer requisições HTTP. 
@@ -105,8 +105,8 @@ export function MateriaForm({ materia, OnSucess }: MateriaFormProps) {
                         {isLoading
                             ? "Salvando..."
                             : isEditing
-                                ? "Atualizar Turma"
-                                : "Criar Turma"}
+                                ? "Atualizar Matéria"
+                                : "Criar Matéria"}
                     </Button>
                 </div>
             </form>

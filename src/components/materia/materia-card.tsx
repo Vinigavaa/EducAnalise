@@ -1,8 +1,9 @@
 "use client"
 
-import { MoreVertical, Link } from "lucide-react"
+import { BookType, MoreVertical } from "lucide-react"
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "../ui/card"
 import { Button } from "../ui/button";
+import { DeleteMateriaDialog } from "./delete-materia-dialog";
 
 interface MateriaCardProps{
     materia: {
@@ -16,20 +17,15 @@ export function MateriaCard({materia}: MateriaCardProps){
         <Card className="hover:shadow-md transition-shadow">
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
-          <CardTitle className="text-xl">{materia.nome}</CardTitle>
-          <Button variant="ghost" size="icon" className="h-8 w-8">
-            <MoreVertical className="h-4 w-4" />
-          </Button>
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+              <BookType className="h-5 w-5 text-primary" />
+            </div>
+            <CardTitle className="text-lg">{materia.nome}</CardTitle>
+          </div>
+          <DeleteMateriaDialog materiaId={materia.id} nome={materia.nome} />
         </div>
       </CardHeader>
-      <CardFooter className="gap-2 pt-3">
-        <Button asChild variant="outline" className="flex-1">
-          <Link href={`/turmas/${materia.id}`}>Ver Detalhes</Link>
-        </Button>
-        <Button asChild className="flex-1">
-          <Link href={`/turmas/${materia.id}/editar`}>Editar</Link>
-        </Button>
-      </CardFooter>
     </Card>
     )
 }

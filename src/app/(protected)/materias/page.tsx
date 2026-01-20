@@ -37,7 +37,7 @@ export default async function MateriaPage() {
                     <p className="text-muted-foreground mt-1">Gerencie suas matérias</p>
                 </div>
                 <Button asChild className="bg-indigo-500">
-                    <Link href="/turmas/nova">
+                    <Link href="/materias/nova">
                         <Plus className="mr-2 h-4 w-4" />
                         Nova Matéria
                     </Link>
