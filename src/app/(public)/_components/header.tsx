@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { handleRegister } from "../_actions/login";
 import { Button } from "@/components/ui/button";
-import { ChartPie, GraduationCap, Menu, Home, BookMarked } from "lucide-react";
+import { ChartPie, GraduationCap, Menu, Home, BookMarked, FileText } from "lucide-react";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { SiGoogle } from "react-icons/si";
 
@@ -21,6 +21,7 @@ export default function Header() {
     const authNavItems = [
         { href: "/turmas", label: "Turmas", icon: GraduationCap },
         { href: "/dashboard", label: "Dashboard", icon: ChartPie },
+        { href: "/materias", label: "Matérias", icon: FileText },
     ]
 
     const NavLinks = () => (
@@ -104,6 +105,12 @@ export default function Header() {
                                 <Link href="/provas" className="flex items-center gap-2">
                                     <BookMarked className="h-4 w-4" />
                                     Provas
+                                </Link>
+                            </Button>
+                            <Button asChild variant="ghost" className="hover:bg-indigo-50">
+                                <Link href="/materias" className="flex items-center gap-2">
+                                    <FileText className="h-4 w-4" />
+                                    Matérias
                                 </Link>
                             </Button>
                             <Button asChild variant="default" className="bg-indigo-500 hover:bg-indigo-900">

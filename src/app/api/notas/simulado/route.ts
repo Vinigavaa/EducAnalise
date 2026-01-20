@@ -47,39 +47,34 @@ export const POST = withAuth(async (request: NextRequest, userId: string) => {
       }
     }
 
-    // Usar transação para salvar todas as notas
-    await prisma.$transaction(async (tx) => {
-      for (const notaAluno of notas) {
-        for (const notaMateria of notaAluno.notasPorMateria) {
-          // Verificar se já existe uma nota para este aluno/matéria
-          const notaExistente = await tx.nota.findFirst({
-            where: {
-              alunoId: notaAluno.alunoId,
-              provaId,
-              simuladoMateriaId: notaMateria.simuladoMateriaId,
-            },
-          });
-
-          if (notaExistente) {
-            // Atualizar nota existente
-            await tx.nota.update({
-              where: { id: notaExistente.id },
-              data: { valor_nota: notaMateria.valor },
-            });
-          } else {
-            // Criar nova nota
-            await tx.nota.create({
-              data: {
-                alunoId: notaAluno.alunoId,
-                provaId,
-                simuladoMateriaId: notaMateria.simuladoMateriaId,
-                valor_nota: notaMateria.valor,
-              },
-            });
-          }
-        }
-      }
-    });
+    // Executar todas as operações de upsert em uma transação com timeout estendido
+    await prisma.$transaction(
+      async (tx) => {
+        await Promise.all(
+          notas.flatMap((notaAluno) =>
+            notaAluno.notasPorMateria.map((notaMateria) =>
+              tx.nota.upsert({
+                where: {
+                  alunoId_provaId_simuladoMateriaId: {
+                    alunoId: notaAluno.alunoId,
+                    provaId,
+                    simuladoMateriaId: notaMateria.simuladoMateriaId,
+                  },
+                },
+                update: { valor_nota: notaMateria.valor },
+                create: {
+                  alunoId: notaAluno.alunoId,
+                  provaId,
+                  simuladoMateriaId: notaMateria.simuladoMateriaId,
+                  valor_nota: notaMateria.valor,
+                },
+              })
+            )
+          )
+        );
+      },
+      { timeout: 30000 }
+    );
 
     return NextResponse.json({ success: true }, { status: 200 });
   } catch (error) {

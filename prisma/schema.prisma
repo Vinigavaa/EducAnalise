@@ -104,6 +104,8 @@ model Nota {
 
   criado_em     DateTime @default(now())
   atualizado_em DateTime @updatedAt
+
+  @@unique([alunoId, provaId, simuladoMateriaId])
 }
 
 model User {
