@@ -1,13 +1,10 @@
 import { MateriaCard } from "./materia-card";
 
-//como deve ser a estrutura de uma materia
 interface Materia{
     id: string,
     nome: string
 }
 
-//receberemos um findMany de busca do prisma com o nome "materias" que irá acontecer no componente de materias -> page.tsx
-//onde ira salvar um array de objetos com todos esses dados recebidos
 interface MateriaListaProps {
     materias: Materia[];
 }
