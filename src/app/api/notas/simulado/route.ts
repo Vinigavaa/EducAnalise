@@ -5,13 +5,12 @@ import { salvarNotasSimuladoSchema } from "@/lib/validations/nota";
 import { z } from "zod";
 import { TipoProva } from "@/generated/prisma/enums";
 
-// POST /api/notas/simulado - Salvar notas de um simulado
+// POST /api/notas/simulado
 export const POST = withAuth(async (request: NextRequest, userId: string) => {
   try {
     const body = await request.json();
     const { provaId, notas } = salvarNotasSimuladoSchema.parse(body);
 
-    // Verificar se a prova existe, pertence ao usuário e é um simulado
     const prova = await prisma.prova.findFirst({
       where: { id: provaId, turma: { userId } },
       include: {
@@ -33,7 +32,6 @@ export const POST = withAuth(async (request: NextRequest, userId: string) => {
       );
     }
 
-    // Verificar se todas as matérias do simulado existem
     const simuladoMateriasIds = prova.simuladoMaterias.map((sm) => sm.id);
 
     for (const notaAluno of notas) {
