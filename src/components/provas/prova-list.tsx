@@ -8,6 +8,9 @@ interface Prova {
   nome: string;
   ano_letivo: number;
   peso: number;
+  _count: {
+    notas: number;
+  };
   turmaId: string;
   tipo: TipoProva;
   data_prova: Date | null;

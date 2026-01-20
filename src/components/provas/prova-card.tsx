@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Users, Calendar, MoreVertical, ClipboardList, Newspaper, CalendarDays } from "lucide-react";
+import { Users, Calendar, MoreVertical, ClipboardList, Newspaper, CalendarDays, ChartNoAxesColumn } from "lucide-react";
 import { TipoProva } from "@/generated/prisma/enums";
 
 interface ProvaCardProps {
@@ -12,6 +12,9 @@ interface ProvaCardProps {
     nome: string;
     ano_letivo: number;
     turmaId: string;
+    _count: {
+      notas: number;
+    };
     tipo: TipoProva;
     data_prova: Date | null;
     turma: {
@@ -53,15 +56,16 @@ export function ProvaCard({ prova }: ProvaCardProps) {
           <Users className="h-4 w-4" />
           <span>Pertence à Turma: {prova.turma?.nome ?? "Sem turma"}</span>
         </div>
+         <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <ChartNoAxesColumn className="h-4 w-4" />
+          <span>Notas Totais: {prova._count.notas ?? "Sem turma"}</span>
+        </div>
       </CardContent>
-      <CardFooter className="gap-2 pt-3">
-        <Button asChild variant="outline" className="flex-1">
-          <Link href={`/provas/${prova.id}`}>Ver Detalhes</Link>
-        </Button>
+      <CardFooter className="gap-1 pt-3">
         <Button asChild variant="outline" className="flex-1">
           <Link href={`/provas/${prova.id}/notas`}>Lançar Notas</Link>
         </Button>
-        <Button asChild className="flex-1">
+        <Button asChild variant="outline" className="flex-1">
           <Link href={`/provas/${prova.id}/editar`}>Editar</Link>
         </Button>
       </CardFooter>
