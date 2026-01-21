@@ -5,6 +5,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Button } from "@/components/ui/button";
 import { Users, Calendar, MoreVertical, ClipboardList, Newspaper, CalendarDays, ChartNoAxesColumn } from "lucide-react";
 import { TipoProva } from "@/generated/prisma/enums";
+import { DeleteProvaDialog } from "./delete-prova-dialog";
 
 interface ProvaCardProps {
   prova: {
@@ -31,7 +32,7 @@ export function ProvaCard({ prova }: ProvaCardProps) {
         <div className="flex items-start justify-between">
           <CardTitle className="text-xl">{prova.nome}</CardTitle>
           <Button variant="ghost" size="icon" className="h-8 w-8">
-            <MoreVertical className="h-4 w-4" />
+            <DeleteProvaDialog provaId={prova.id} provaNome={prova.nome} />
           </Button>
         </div>
       </CardHeader>

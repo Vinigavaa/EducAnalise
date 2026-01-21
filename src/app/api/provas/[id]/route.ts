@@ -286,11 +286,28 @@ export const DELETE = withAuth(async (
       );
     }
 
-    // Excluir a prova (cascade delete vai excluir as notas vinculadas)
-    await prisma.prova.delete({
-      where: {
-        id: params.id,
-      },
+    // Excluir a prova e suas dependências em uma transação
+    await prisma.$transaction(async (tx) => {
+      // Primeiro, excluir as notas vinculadas
+      await tx.nota.deleteMany({
+        where: {
+          provaId: params.id,
+        },
+      });
+
+      // Depois, excluir os simuladoMaterias (se houver)
+      await tx.simuladoMateria.deleteMany({
+        where: {
+          provaId: params.id,
+        },
+      });
+
+      // Por fim, excluir a prova
+      await tx.prova.delete({
+        where: {
+          id: params.id,
+        },
+      });
     });
 
     return NextResponse.json(

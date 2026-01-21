@@ -1,0 +1,247 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Card, CardContent } from "@/components/ui/card";
+import { BarChart3, Loader2 } from "lucide-react";
+import {
+  GraficoBarrasNotas,
+  GraficoPizzaMaterias,
+  CardMediaCircular,
+  CardMelhora,
+  CardMaiorNota,
+} from "@/components/dashboard";
+
+interface Turma {
+  id: string;
+  nome: string;
+  ano_letivo: number;
+}
+
+interface Prova {
+  id: string;
+  nome: string;
+  tipo: "COMUM" | "SIMULADO";
+  peso: number;
+  data_prova: string | null;
+}
+
+interface DashboardData {
+  prova: {
+    id: string;
+    nome: string;
+    tipo: "COMUM" | "SIMULADO";
+    peso: number;
+    data_prova: string | null;
+  };
+  notasPorAluno: { alunoId: string; nome: string; nota: number }[];
+  mediaGeral: number;
+  alunoMaiorNota: { alunoId: string; nome: string; nota: number } | null;
+  porcentagemMelhora: number | null;
+  provaAnteriorNome: string | null;
+  materiasPorAcertos: { materiaId: string; nome: string; mediaAcertos: number }[];
+}
+
+interface DashboardContentProps {
+  turmas: Turma[];
+}
+
+export function DashboardContent({ turmas }: DashboardContentProps) {
+  const [turmaId, setTurmaId] = useState<string>("");
+  const [provaId, setProvaId] = useState<string>("");
+  const [provas, setProvas] = useState<Prova[]>([]);
+  const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [loadingProvas, setLoadingProvas] = useState(false);
+
+  // Buscar provas quando turma mudar
+  useEffect(() => {
+    if (!turmaId) {
+      setProvas([]);
+      setProvaId("");
+      setDashboardData(null);
+      return;
+    }
+
+    const fetchProvas = async () => {
+      setLoadingProvas(true);
+      try {
+        const res = await fetch(`/api/provas?turmaId=${turmaId}`);
+        if (res.ok) {
+          const data = await res.json();
+          // Converter peso para number
+          const provasFormatadas = data.map((p: { id: string; nome: string; tipo: "COMUM" | "SIMULADO"; peso: string | number; data_prova: string | null }) => ({
+            ...p,
+            peso: Number(p.peso),
+          }));
+          setProvas(provasFormatadas);
+        }
+      } catch (error) {
+        console.error("Erro ao buscar provas:", error);
+      } finally {
+        setLoadingProvas(false);
+      }
+    };
+
+    fetchProvas();
+    setProvaId("");
+    setDashboardData(null);
+  }, [turmaId]);
+
+  // Buscar dados do dashboard quando prova mudar
+  useEffect(() => {
+    if (!turmaId || !provaId) {
+      setDashboardData(null);
+      return;
+    }
+
+    const fetchDashboardData = async () => {
+      setLoading(true);
+      try {
+        const res = await fetch(`/api/dashboard?turmaId=${turmaId}&provaId=${provaId}`);
+        if (res.ok) {
+          const data = await res.json();
+          setDashboardData(data);
+        }
+      } catch (error) {
+        console.error("Erro ao buscar dados do dashboard:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDashboardData();
+  }, [turmaId, provaId]);
+
+  return (
+    <div className="space-y-6">
+      {/* Seletores */}
+      <div className="flex flex-col sm:flex-row gap-4">
+        <div className="flex-1">
+          <label className="text-sm font-medium text-zinc-700 mb-2 block">
+            Selecione a Turma
+          </label>
+          <Select value={turmaId} onValueChange={setTurmaId}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Selecione uma turma" />
+            </SelectTrigger>
+            <SelectContent>
+              {turmas.map((turma) => (
+                <SelectItem key={turma.id} value={turma.id}>
+                  {turma.nome} ({turma.ano_letivo})
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="flex-1">
+          <label className="text-sm font-medium text-zinc-700 mb-2 block">
+            Selecione a Prova
+          </label>
+          <Select
+            value={provaId}
+            onValueChange={setProvaId}
+            disabled={!turmaId || loadingProvas}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue
+                placeholder={
+                  loadingProvas
+                    ? "Carregando..."
+                    : !turmaId
+                    ? "Selecione uma turma primeiro"
+                    : "Selecione uma prova"
+                }
+              />
+            </SelectTrigger>
+            <SelectContent>
+              {provas.map((prova) => (
+                <SelectItem key={prova.id} value={prova.id}>
+                  {prova.nome} ({prova.tipo === "SIMULADO" ? "Simulado" : "Comum"})
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
+      {/* Estado vazio */}
+      {!turmaId || !provaId ? (
+        <Card className="py-16">
+          <CardContent className="flex flex-col items-center justify-center text-center">
+            <div className="p-4 rounded-full bg-indigo-50 mb-4">
+              <BarChart3 className="h-12 w-12 text-indigo-500" />
+            </div>
+            <h3 className="text-xl font-semibold text-zinc-800 mb-2">
+              Selecione uma turma e prova
+            </h3>
+            <p className="text-muted-foreground max-w-md">
+              Para visualizar os graficos e estatisticas, selecione uma turma e uma prova
+              nos campos acima.
+            </p>
+          </CardContent>
+        </Card>
+      ) : loading ? (
+        <Card className="py-16">
+          <CardContent className="flex flex-col items-center justify-center">
+            <Loader2 className="h-12 w-12 text-indigo-500 animate-spin mb-4" />
+            <p className="text-muted-foreground">Carregando dados...</p>
+          </CardContent>
+        </Card>
+      ) : dashboardData && dashboardData.notasPorAluno.length > 0 ? (
+        <>
+          {/* Cards de estatisticas */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <CardMediaCircular
+              media={dashboardData.mediaGeral}
+              pesoProva={dashboardData.prova.peso}
+            />
+            <CardMelhora
+              porcentagemMelhora={dashboardData.porcentagemMelhora}
+              provaAnteriorNome={dashboardData.provaAnteriorNome}
+            />
+            <CardMaiorNota
+              alunoNome={dashboardData.alunoMaiorNota?.nome || null}
+              nota={dashboardData.alunoMaiorNota?.nota || null}
+              pesoProva={dashboardData.prova.peso}
+            />
+          </div>
+
+          {/* Grafico de barras */}
+          <GraficoBarrasNotas
+            notas={dashboardData.notasPorAluno}
+            pesoProva={dashboardData.prova.peso}
+          />
+
+          {/* Grafico de pizza (apenas para simulados) */}
+          {dashboardData.prova.tipo === "SIMULADO" &&
+            dashboardData.materiasPorAcertos.length > 0 && (
+              <GraficoPizzaMaterias materias={dashboardData.materiasPorAcertos} />
+            )}
+        </>
+      ) : dashboardData ? (
+        <Card className="py-16">
+          <CardContent className="flex flex-col items-center justify-center text-center">
+            <div className="p-4 rounded-full bg-yellow-50 mb-4">
+              <BarChart3 className="h-12 w-12 text-yellow-500" />
+            </div>
+            <h3 className="text-xl font-semibold text-zinc-800 mb-2">
+              Sem notas lancadas
+            </h3>
+            <p className="text-muted-foreground max-w-md">
+              Esta prova ainda nao possui notas lancadas. Lance as notas para visualizar
+              os graficos e estatisticas.
+            </p>
+          </CardContent>
+        </Card>
+      ) : null}
+    </div>
+  );
+}
