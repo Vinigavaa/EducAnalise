@@ -17,6 +17,7 @@ interface MateriaAcertos {
   materiaId: string;
   nome: string;
   mediaAcertos: number;
+  [key: string]: string | number;
 }
 
 interface GraficoPizzaMateriasProps {
@@ -91,14 +92,14 @@ export function GraficoPizzaMaterias({ materias }: GraficoPizzaMateriasProps) {
                 cx="50%"
                 cy="50%"
                 outerRadius={100}
-                label={({ nome, mediaAcertos }) => `${nome}: ${mediaAcertos.toFixed(1)}`}
+                label={({ name, value }) => `${name}: ${Number(value).toFixed(1)}`}
               >
                 {materias.map((_, index) => (
                   <Cell key={`cell-${index}`} fill={CORES[index % CORES.length]} />
                 ))}
               </Pie>
               <Tooltip
-                formatter={(value: number) => [value.toFixed(2), "Media"]}
+                formatter={(value) => [Number(value).toFixed(2), "Media"]}
               />
               <Legend />
             </PieChart>
