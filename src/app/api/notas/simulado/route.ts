@@ -3,7 +3,7 @@ import { withAuth } from "@/lib/auth-helper";
 import prisma from "@/lib/prisma";
 import { salvarNotasSimuladoSchema } from "@/lib/validations/nota";
 import { z } from "zod";
-import { TipoProva } from "@/generated/prisma/enums";
+import { TipoProva } from "@/generated/prisma";
 
 // POST /api/notas/simulado
 export const POST = withAuth(async (request: NextRequest, userId: string) => {

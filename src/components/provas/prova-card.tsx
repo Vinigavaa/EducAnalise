@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Users, Calendar, MoreVertical, ClipboardList, Newspaper, CalendarDays, ChartNoAxesColumn } from "lucide-react";
-import { TipoProva } from "@/generated/prisma/enums";
+import { TipoProva } from "@/generated/prisma";
 import { DeleteProvaDialog } from "./delete-prova-dialog";
 
 interface ProvaCardProps {

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { withAuth } from "@/lib/auth-helper";
 import prisma from "@/lib/prisma";
-import { TipoProva } from "@/generated/prisma/enums";
+import { TipoProva } from "@/generated/prisma";
 
 // GET /api/dashboard?turmaId=X&provaId=Y - Buscar dados do dashboard
 export const GET = withAuth(async (request: NextRequest, userId: string) => {

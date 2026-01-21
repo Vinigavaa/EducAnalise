@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { User, Save } from "lucide-react";
-import { TipoProva } from "@/generated/prisma/enums";
+import { TipoProva } from "@/generated/prisma";
 
 interface Aluno {
   id: string;

@@ -1,6 +1,6 @@
 "use client";
 
-import { TipoProva } from "@/generated/prisma/enums";
+import { TipoProva } from "@/generated/prisma";
 import { ProvaCard } from "./prova-card";
 
 interface Prova {

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { TipoProva } from "@/generated/prisma/enums";
+import { TipoProva } from "@/generated/prisma";
 
 // Schema para matéria do simulado (com peso)
 export const simuladoMateriaSchema = z.object({

@@ -3,7 +3,7 @@ import { withAuth } from "@/lib/auth-helper";
 import prisma from "@/lib/prisma";
 import { provaSchema } from "@/lib/validations/prova";
 import { z } from "zod";
-import { TipoProva } from "@/generated/prisma/enums";
+import { TipoProva } from "@/generated/prisma";
 
 // GET /api/provas/[id] - Buscar uma prova específica
 export const GET = withAuth(async (
