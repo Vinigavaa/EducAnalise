@@ -21,6 +21,7 @@ interface NotaAluno {
   nota: number;
 }
 
+
 interface GraficoBarrasNotasProps {
   notas: NotaAluno[];
   pesoProva: number;
