@@ -96,7 +96,7 @@ export function GraficoBarrasNotas({ notas, pesoProva }: GraficoBarrasNotasProps
               />
               <YAxis domain={[0, pesoProva]} />
               <Tooltip
-                formatter={(value: number) => [value.toFixed(2), "Nota"]}
+                formatter={(value?: number) => [value !== undefined ? value.toFixed(2) : "0.00","Nota",]}
                 labelFormatter={(label) => `Aluno: ${label}`}
               />
               <Bar dataKey="nota" name="Nota">

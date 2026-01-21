@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -176,6 +176,7 @@ export function LancarNotasForm({
       setError(err instanceof Error ? err.message : "Erro ao salvar notas");
     } finally {
       setIsLoading(false);
+      redirect("/provas");
     }
   };
 

@@ -1,22 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue,} from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
 import { BarChart3, Loader2 } from "lucide-react";
-import {
-  GraficoBarrasNotas,
-  GraficoPizzaMaterias,
-  CardMediaCircular,
-  CardMelhora,
-  CardMaiorNota,
-} from "@/components/dashboard";
+import { GraficoBarrasNotas, GraficoPizzaMaterias, CardMediaCircular, CardMelhora, CardMaiorNota, } from "@/components/dashboard";
 
 interface Turma {
   id: string;

@@ -31,9 +31,7 @@ export function ProvaCard({ prova }: ProvaCardProps) {
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <CardTitle className="text-xl">{prova.nome}</CardTitle>
-          <Button variant="ghost" size="icon" className="h-8 w-8">
-            <DeleteProvaDialog provaId={prova.id} provaNome={prova.nome} />
-          </Button>
+          <DeleteProvaDialog provaId={prova.id} provaNome={prova.nome} />
         </div>
       </CardHeader>
       <CardContent className="space-y-2">

@@ -119,14 +119,18 @@ export const GET = withAuth(async (request: NextRequest, userId: string) => {
     let porcentagemMelhora: number | null = null;
     let provaAnteriorNome: string | null = null;
 
-    // Buscar prova anterior da mesma turma (por data ou criação)
+    // Buscar prova anterior da mesma turma e do mesmo tipo (por data da prova ou criação)
+    // Provas comuns só comparam com provas comuns, simulados só comparam com simulados
     const provaAnterior = await prisma.prova.findFirst({
       where: {
         turmaId,
         id: { not: provaId },
-        criado_em: { lt: prova.criado_em },
+        tipo: prova.tipo, // Filtrar pelo mesmo tipo de prova
+        ...(prova.data_prova
+          ? { data_prova: { lt: prova.data_prova } }
+          : { criado_em: { lt: prova.criado_em } }),
       },
-      orderBy: { criado_em: "desc" },
+      orderBy: prova.data_prova ? { data_prova: "desc" } : { criado_em: "desc" },
       include: {
         notas: true,
         simuladoMaterias: {
