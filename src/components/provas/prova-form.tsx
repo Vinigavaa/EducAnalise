@@ -3,7 +3,7 @@
 import { TipoProva } from "@/generated/prisma";
 import { ProvaInput, provaSchema } from "@/lib/validations/prova";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { redirect, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage, Form } from "../ui/form";
@@ -87,7 +87,6 @@ export function ProvaForm({ prova, onSuccess }: ProvaFormProps) {
                 console.error("Erro ao buscar turmas:", error);
             } finally {
                 setLoadingTurmas(false);
-                redirect("/provas");
             }
         }
         fetchTurmas();
