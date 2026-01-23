@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { DeleteAlunoDialog } from "./delete-aluno-dialog";
-import { User, ChevronRight } from "lucide-react";
+import { KeyRound, User } from "lucide-react";
 
 interface AlunoCardProps {
   aluno: {
@@ -25,10 +25,10 @@ export function AlunoCard({ aluno, turmaId }: AlunoCardProps) {
             </div>
             <CardTitle className="text-lg">{aluno.nome}</CardTitle>
           </div>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-3">
             <Button variant="ghost" size="icon" asChild>
               <Link href={`/turmas/${turmaId}/alunos/${aluno.id}`}>
-                <ChevronRight className="h-5 w-5" />
+              <KeyRound className="h-5 w-5" />
               </Link>
             </Button>
             <DeleteAlunoDialog alunoId={aluno.id} alunoNome={aluno.nome} />

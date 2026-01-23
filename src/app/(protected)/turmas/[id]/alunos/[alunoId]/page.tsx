@@ -143,44 +143,6 @@ export default async function AlunoDetalhesPage({ params }: AlunoDetalhesPagePro
       </div>
 
       <GerenciarCredenciais alunoId={aluno.id} alunoNome={aluno.nome} />
-
-      {aluno.notas.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <BookOpen className="h-5 w-5" />
-              Ultimas Notas
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              {aluno.notas
-                .filter((n) => !n.simuladoMateriaId)
-                .slice(0, 5)
-                .map((nota) => (
-                  <div
-                    key={nota.id}
-                    className="flex justify-between items-center py-2 border-b last:border-0"
-                  >
-                    <div>
-                      <p className="font-medium">{nota.prova.nome}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {nota.prova.data_prova
-                          ? new Date(nota.prova.data_prova).toLocaleDateString(
-                              "pt-BR"
-                            )
-                          : "Data nao definida"}
-                      </p>
-                    </div>
-                    <span className="text-lg font-bold">
-                      {Number(nota.valor_nota).toFixed(1)}
-                    </span>
-                  </div>
-                ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
     </div>
   );
 }

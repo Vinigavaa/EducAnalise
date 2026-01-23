@@ -86,7 +86,7 @@ export default function Header() {
                         className="w-full bg-indigo-500 hover:bg-indigo-900 justify-center my-2"
                     >
                         <SiGoogle size={24} color="#ffffff" />
-                        Entrar com Google
+                        Fazer Login
                     </Button>
                 )}
             </div>
@@ -136,7 +136,7 @@ export default function Header() {
                     ) : (
                         <Button onClick={handleLogin} variant="default" className="bg-indigo-500 hover:bg-indigo-900">
                             <SiGoogle size={24} color="#ffffff" />
-                            Entrar com Google
+                            Fazer Login
                         </Button>
                     )}
                 </nav>
