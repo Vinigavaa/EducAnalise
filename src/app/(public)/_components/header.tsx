@@ -1,6 +1,6 @@
 "use client"
 import { useSession } from "next-auth/react";
-import { usePathname } from "next/navigation";
+import { redirect, usePathname } from "next/navigation";
 import Link from "next/link";
 import { useState } from "react";
 import { handleRegister } from "../_actions/login";
@@ -94,7 +94,7 @@ export default function Header() {
     )
 
     async function handleLogin() {
-        await handleRegister("google")
+        redirect("/login");
     }
 
     return (
