@@ -125,7 +125,7 @@ export default async function TurmaPage(props: TurmaPageProps) {
           </div>
         </CardHeader>
         <CardContent>
-          <AlunoList alunos={turma.alunos} />
+          <AlunoList alunos={turma.alunos} turmaId={turma.id} />
         </CardContent>
       </Card>
     </div>

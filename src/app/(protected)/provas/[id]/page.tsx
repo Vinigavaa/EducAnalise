@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft, Calendar, Users, FileText, TrendingUp, Pencil } from "lucide-react";
 import { DeleteProvaDialog } from "@/components/provas/delete-prova-dialog";
+import { PublicarProvaButton, StatusPublicacaoBadge } from "@/components/provas/publicar-prova-button";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
@@ -60,12 +61,20 @@ export default async function ProvaDetalhesPage({ params }: ProvaDetalhesPagePro
           </Link>
         </Button>
         <div className="flex-1">
-          <h1 className="text-3xl font-bold text-zinc-800">{prova.nome}</h1>
+          <div className="flex items-center gap-3">
+            <h1 className="text-3xl font-bold text-zinc-800">{prova.nome}</h1>
+            <StatusPublicacaoBadge publicada={prova.publicada} />
+          </div>
           <p className="text-muted-foreground mt-1">
             Detalhes da prova
           </p>
         </div>
         <div className="flex gap-2">
+          <PublicarProvaButton
+            provaId={prova.id}
+            publicada={prova.publicada}
+            provaNome={prova.nome}
+          />
           <Button variant="outline" asChild>
             <Link href={`/provas/${prova.id}/editar`}>
               <Pencil className="mr-2 h-4 w-4" />

@@ -9,9 +9,10 @@ interface Aluno {
 
 interface AlunoListProps {
   alunos: Aluno[];
+  turmaId: string;
 }
 
-export function AlunoList({ alunos }: AlunoListProps) {
+export function AlunoList({ alunos, turmaId }: AlunoListProps) {
   if (alunos.length === 0) {
     return (
       <div className="text-center py-8 border-2 border-dashed rounded-lg">
@@ -28,7 +29,7 @@ export function AlunoList({ alunos }: AlunoListProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {alunos.map((aluno) => (
-        <AlunoCard key={aluno.id} aluno={aluno} />
+        <AlunoCard key={aluno.id} aluno={aluno} turmaId={turmaId} />
       ))}
     </div>
   );

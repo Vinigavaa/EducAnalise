@@ -1,5 +1,6 @@
 "use client"
 import { useSession } from "next-auth/react";
+import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { useState } from "react";
 import { handleRegister } from "../_actions/login";
@@ -7,10 +8,22 @@ import { Button } from "@/components/ui/button";
 import { ChartPie, GraduationCap, Menu, Home, BookMarked, FileText } from "lucide-react";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { SiGoogle } from "react-icons/si";
+import { UserRole } from "@/generated/prisma";
 
 export default function Header() {
     const { data: session, status } = useSession();
+    const pathname = usePathname();
     const [isOpen, setIsOpen] = useState(false);
+
+    // Nao mostrar header nas rotas de aluno ou login
+    if (pathname.startsWith("/aluno") || pathname === "/login") {
+        return null;
+    }
+
+    // Se for aluno logado, nao mostrar este header
+    if (session?.user?.role === UserRole.ALUNO) {
+        return null;
+    }
 
     // Rotas públicas (sempre visíveis)
     const publicNavItems = [

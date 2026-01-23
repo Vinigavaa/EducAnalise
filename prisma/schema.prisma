@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider      = "prisma-client-js"
   output        = "../src/generated/prisma"
@@ -22,7 +16,7 @@ model Turma {
   alunos      Aluno[]
   provas      Prova[]
   userId      String?    @map("user_id")
-  user        User?      @relation(fields: [userId], references: [id])
+  user        users?     @relation(fields: [userId], references: [id])
 
   criado_em     DateTime @default(now())
   atualizado_em DateTime @updatedAt
@@ -34,16 +28,27 @@ model Aluno {
   turmaId    String   @map("turma_id")
   turma      Turma    @relation(fields: [turmaId], references: [id])
   notas      Nota[]
+  userAccount   users?
 
   criado_em     DateTime @default(now())
   atualizado_em DateTime @updatedAt
+}
+
+model AlunoCredential {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  user            users    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  username        String   @unique
+  passwordHash    String
+  mustChangePassword Boolean @default(true)
+  lastLogin       DateTime?
 }
 
 model Materia {
   id                String              @id @default(uuid())
   nome              String
   userId            String?             @map("user_id")
-  user              User?               @relation(fields: [userId], references: [id])
+  user              users?              @relation(fields: [userId], references: [id])
   simuladoMaterias  SimuladoMateria[]
   criado_em         DateTime            @default(now())
   atualizado_em     DateTime            @updatedAt
@@ -54,6 +59,11 @@ model Materia {
 enum TipoProva {
   COMUM
   SIMULADO
+}
+
+enum UserRole {
+  PROFESSOR
+  ALUNO
 }
 
 model SimuladoMateria {
@@ -83,9 +93,11 @@ model Prova {
   tipo              TipoProva
   data_prova        DateTime?
   userId            String?             @map("user_id")
-  user              User?               @relation(fields: [userId], references: [id])
+  user              users?              @relation(fields: [userId], references: [id])
   simuladoMaterias  SimuladoMateria[]
   notas             Nota[]
+  publicada         Boolean             @default(false)
+  dataPublicacao    DateTime?
 
   criado_em     DateTime @default(now())
   atualizado_em DateTime @updatedAt
@@ -109,7 +121,7 @@ model Nota {
   @@unique([alunoId, provaId, simuladoMateriaId])
 }
 
-model User {
+model users {
   id            String    @id @default(cuid())
   name          String?
   email         String?   @unique
@@ -118,16 +130,18 @@ model User {
   status        Boolean?   @default(true)
   stripe_customer_id String?
   subscription  Subscription?
-  accounts      Account[]
-  sessions      Session[]
+  accounts      accounts[]
+  sessions      sessions[]
   turmas        Turma[]
   materias      Materia[]
   provas        Prova[]
-
-  @@map("users")
+  role          UserRole  @default(PROFESSOR)
+  alunoId       String?   @unique
+  aluno         Aluno?    @relation(fields: [alunoId], references: [id])
+  alunoCredential AlunoCredential?
 }
 
-model Account {
+model accounts {
   id                String  @id @default(cuid())
   userId            String  @map("user_id")
   type              String
@@ -141,20 +155,17 @@ model Account {
   id_token          String? @db.Text
   session_state     String?
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user users @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
-  @@map("accounts")
 }
 
-
-model VerificationToken {
+model verification_tokens {
   identifier String
   token      String
   expires    DateTime
- 
+
   @@unique([identifier, token])
-  @@map("verification_tokens")
 }
 
 enum Plan {
@@ -162,23 +173,21 @@ enum Plan {
   PROFESSIONAL
 }
 
-model Subscription{
-  id String @id @default(uuid())
-  status String
-  plan Plan
-  priceId String
+model Subscription {
+  id        String   @id @default(uuid())
+  status    String
+  plan      Plan
+  priceId   String
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt
-  userId String @unique
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String   @unique
+  user      users    @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-model Session {
+model sessions {
   id           String   @id @default(cuid())
   sessionToken String   @unique @map("session_token")
   userId       String   @map("user_id")
   expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
- 
-  @@map("sessions")
+  user         users    @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
