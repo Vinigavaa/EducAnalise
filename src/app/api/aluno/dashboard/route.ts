@@ -64,8 +64,9 @@ export const GET = withAluno(async (
     const notasValores = notas.map((n) => Number(n.valor_nota));
     const mediaProvasComuns = notasValores.length > 0 ? notasValores.reduce((a, b) => a + b, 0) / notasValores.length : 0;
     const mediaSimulados = notaSimulado.length > 0 ? notaSimulado.reduce((a, b) => a + b, 0) / notaSimulado.length : 0;
-    const maiorNota = notasValores.length > 0 ? Math.max(...notasValores) : 0;
-    const menorNota = notasValores.length > 0 ? Math.min(...notasValores) : 0;
+    const todasNotas = [...notasValores, ...notaSimulado];
+    const maiorNota = todasNotas.length > 0 ? Math.max(...todasNotas) : 0;
+    const menorNota = todasNotas.length > 0 ? Math.min(...todasNotas) : 0;
 
     let mediaGeral = 0;
     if(notasValores.length > 0  && notaSimulado.length > 0){
@@ -99,13 +100,10 @@ export const GET = withAluno(async (
         data_prova: "asc",
       },
     });
-
+//falta aqui
     const comparacaoTurma = provasPublicadas.map((prova) => {
       const notasDaProva = prova.notas.map((n) => Number(n.valor_nota));
-      const mediaTurma =
-        notasDaProva.length > 0
-          ? notasDaProva.reduce((a, b) => a + b, 0) / notasDaProva.length
-          : 0;
+      const mediaTurma = notasDaProva.length > 0 ? notasDaProva.reduce((a, b) => a + b, 0) / notasDaProva.length : 0;
       const notaAluno = prova.notas.find((n) => n.alunoId === alunoId);
 
       return {
@@ -115,7 +113,6 @@ export const GET = withAluno(async (
       };
     });
 
-    // Calcular posição na turma
     const alunosDaTurma = await prisma.aluno.findMany({
       where: { turmaId: aluno.turmaId },
       include: {

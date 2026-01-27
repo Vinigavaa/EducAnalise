@@ -117,7 +117,7 @@ export function DashboardContent() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {data.estatisticas.maiorNota.toFixed(1)}
+              {data.estatisticas.maiorNota}
             </div>
             <p className="text-xs text-muted-foreground">Melhor desempenho</p>
           </CardContent>
@@ -143,7 +143,7 @@ export function DashboardContent() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {data.estatisticas.posicaoTurma}o
+              {data.estatisticas.posicaoTurma}º
             </div>
             <p className="text-xs text-muted-foreground">
               de {data.estatisticas.totalAlunosTurma} aluno(s)
