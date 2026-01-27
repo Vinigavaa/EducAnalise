@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { GraficoEvolucao } from "./grafico-evolucao";
+import { GraficoEvolucao } from "./line-chart";
 import { GraficoComparacaoTurma } from "./grafico-comparacao-turma";
 import { GraficoMaterias } from "./grafico-materias";
 import { TrendingUp, Award, BookOpen, Users } from "lucide-react";
