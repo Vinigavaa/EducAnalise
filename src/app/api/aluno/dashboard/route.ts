@@ -10,7 +10,6 @@ export const GET = withAluno(async (
   alunoId: string
 ) => {
   try {
-    // Buscar aluno com turma
     const aluno = await prisma.aluno.findUnique({
       where: { id: alunoId },
       include: {
@@ -25,7 +24,6 @@ export const GET = withAluno(async (
       );
     }
 
-    // Buscar notas de provas publicadas
     const notas = await prisma.nota.findMany({
       where: {
         alunoId,
@@ -52,16 +50,32 @@ export const GET = withAluno(async (
       },
     });
 
-    // Calcular estatísticas
+    const simulado = await prisma.nota.findMany({
+      where: {
+        alunoId,
+        prova:{
+          publicada: true,
+          tipo: 'SIMULADO'
+        },
+      },
+    });
+
+    const notaSimulado = simulado.map((n) => Number(n.valor_nota));
     const notasValores = notas.map((n) => Number(n.valor_nota));
-    const mediaGeral =
-      notasValores.length > 0
-        ? notasValores.reduce((a, b) => a + b, 0) / notasValores.length
-        : 0;
+    const mediaProvasComuns = notasValores.length > 0 ? notasValores.reduce((a, b) => a + b, 0) / notasValores.length : 0;
+    const mediaSimulados = notaSimulado.length > 0 ? notaSimulado.reduce((a, b) => a + b, 0) / notaSimulado.length : 0;
     const maiorNota = notasValores.length > 0 ? Math.max(...notasValores) : 0;
     const menorNota = notasValores.length > 0 ? Math.min(...notasValores) : 0;
 
-    // Dados para evolução temporal
+    let mediaGeral = 0;
+    if(notasValores.length > 0  && notaSimulado.length > 0){
+      mediaGeral = (mediaProvasComuns + mediaSimulados) / 2;
+    } else if (notasValores.length > 0){
+      mediaGeral= mediaProvasComuns
+    } else if (notaSimulado.length > 0){
+      mediaGeral = mediaSimulados
+    }
+
     const evolucao = notas.map((n) => ({
       prova: n.prova.nome,
       nota: Number(n.valor_nota),
@@ -172,7 +186,7 @@ export const GET = withAluno(async (
         mediaGeral: Math.round(mediaGeral * 100) / 100,
         maiorNota,
         menorNota,
-        totalProvas: notas.length,
+        totalProvas: provasPublicadas.length,
         posicaoTurma,
         totalAlunosTurma: alunosDaTurma.length,
       },

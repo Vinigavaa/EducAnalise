@@ -1,11 +1,11 @@
 "use client"
-import { useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import { redirect, usePathname } from "next/navigation";
 import Link from "next/link";
 import { useState } from "react";
 import { handleRegister } from "../_actions/login";
 import { Button } from "@/components/ui/button";
-import { ChartPie, GraduationCap, Menu, Home, BookMarked, FileText } from "lucide-react";
+import { ChartPie, GraduationCap, Menu, Home, BookMarked, FileText, LogOut } from "lucide-react";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { SiGoogle } from "react-icons/si";
 import { UserRole } from "@/generated/prisma";
@@ -131,6 +131,14 @@ export default function Header() {
                                     <ChartPie className="h-4 w-4" />
                                     Dashboard
                                 </Link>
+                            </Button>
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => signOut({ callbackUrl: "/login" })}
+                                >
+                                <LogOut className="h-4 w-4 mr-2" />
+                                Sair
                             </Button>
                         </>
                     ) : (
