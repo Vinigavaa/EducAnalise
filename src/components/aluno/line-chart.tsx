@@ -32,11 +32,11 @@ export function GraficoEvolucao({ data }: GraficoEvolucaoProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Line Chart</CardTitle>
+        <CardTitle>6 últimas provas</CardTitle>
         <CardDescription>Evolução das Notas</CardDescription>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={chartConfig}>
+        <ChartContainer config={chartConfig} className="h-[200px] w-full">
           <LineChart
             accessibilityLayer
             data={chartData}

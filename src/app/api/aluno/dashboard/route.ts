@@ -77,7 +77,7 @@ export const GET = withAluno(async (
       mediaGeral = mediaSimulados
     }
 
-    const evolucao = notas.map((n) => ({
+    const evolucao = notas.slice(-6).map((n) => ({
       prova: n.prova.nome,
       nota: Number(n.valor_nota),
       data: n.prova.data_prova,
