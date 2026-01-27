@@ -1,22 +1,16 @@
 import NextAuth from "next-auth";
 import prisma from "./prisma";
-import Google from "next-auth/providers/google";
 import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { UserRole } from "@/generated/prisma";
 import { CustomPrismaAdapter } from "./prisma-adapter";
+import { authConfig } from "./auth.config";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
+  ...authConfig,
   adapter: CustomPrismaAdapter(prisma),
-  trustHost: true,
-  session: {
-    strategy: "jwt",
-  },
   providers: [
-    Google({
-      clientId: process.env.AUTH_GOOGLE_ID,
-      clientSecret: process.env.AUTH_GOOGLE_SECRET,
-    }),
+    ...authConfig.providers,
     Credentials({
       id: "aluno-credentials",
       name: "Aluno",
@@ -75,6 +69,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     }),
   ],
   callbacks: {
+    ...authConfig.callbacks,
     async jwt({ token, user, trigger, session }) {
       if (user) {
         token.id = user.id;
@@ -83,7 +78,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         token.mustChangePassword = user.mustChangePassword;
       }
 
-      // Quando precisar atualizar a sessão (após trocar senha, por exemplo)
       if (trigger === "update" && session) {
         if (session.mustChangePassword !== undefined) {
           token.mustChangePassword = session.mustChangePassword;
@@ -104,17 +98,5 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
       return token;
     },
-    async session({ session, token }) {
-      if (token) {
-        session.user.id = token.id as string;
-        session.user.role = token.role as UserRole;
-        session.user.alunoId = token.alunoId as string | null;
-        session.user.mustChangePassword = token.mustChangePassword as boolean;
-      }
-      return session;
-    },
-  },
-  pages: {
-    signIn: "/login",
   },
 });
