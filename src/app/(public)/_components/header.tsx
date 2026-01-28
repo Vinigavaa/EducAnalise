@@ -2,6 +2,7 @@
 import { signOut, useSession } from "next-auth/react";
 import { redirect, usePathname } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ChartPie, GraduationCap, Menu, Home, BookMarked, FileText, LogOut } from "lucide-react";
@@ -94,7 +95,8 @@ export default function Header() {
     return (
         <header className="fixed top-0 right-0 left-0 z-[999] py-4 px-4 bg-white shadow-sm">
             <div className="container mx-auto flex items-center justify-between" suppressHydrationWarning>
-                <Link href={"/"} className="text-3xl font-bold text-zinc-900">
+                <Link href={"/"} className="flex items-center gap-2 text-3xl font-bold text-zinc-900">
+                    <Image src="/logoeduca.png" alt="EducAnalise Logo" width={40} height={40} />
                     Educ<span className="text-indigo-700">Analise</span>
                 </Link>
                 <nav className="hidden md:flex items-center gap-4 text-zinc-900 font-medium">
