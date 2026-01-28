@@ -13,7 +13,6 @@ export default async function ProtectedLayout({
     redirect("/login");
   }
 
-  // Redirecionar alunos para a área de alunos
   if (session.user.role === UserRole.ALUNO) {
     redirect("/aluno/dashboard");
   }

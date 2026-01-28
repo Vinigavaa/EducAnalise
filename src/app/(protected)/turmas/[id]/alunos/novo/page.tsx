@@ -18,7 +18,6 @@ export default async function NovoAlunoPage(props: NovoAlunoPageProps) {
     redirect("/");
   }
 
-  // Verificar se a turma existe e pertence ao usuário
   const turma = await prisma.turma.findFirst({
     where: {
       id: params.id,

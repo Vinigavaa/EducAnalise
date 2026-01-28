@@ -66,7 +66,6 @@ export function Testimonials() {
         }
     }
 
-    // Auto-play a cada 5 segundos
     useEffect(() => {
         const interval = setInterval(() => {
             nextSlide()
@@ -77,7 +76,6 @@ export function Testimonials() {
 
     return (
         <section className="bg-gradient-to-br from-indigo-50 via-purple-50 to-white py-16 md:py-24 relative overflow-hidden">
-            {/* Elementos decorativos de fundo */}
             <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
                 <div className="absolute top-20 -left-20 w-64 h-64 bg-indigo-200/30 rounded-full blur-3xl"></div>
                 <div className="absolute bottom-20 -right-20 w-80 h-80 bg-purple-200/30 rounded-full blur-3xl"></div>
@@ -91,7 +89,6 @@ export function Testimonials() {
             </div>
 
             <div className="container mx-auto px-4 relative z-10">
-                {/* Título */}
                 <div className="text-center mb-12 md:mb-16">
                     <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-zinc-800 mb-4">
                         Palavra de quem já é <span className="text-indigo-600">EducAnalise</span>
@@ -101,12 +98,9 @@ export function Testimonials() {
                     </p>
                 </div>
 
-                {/* Carrossel */}
                 <div className="max-w-4xl mx-auto">
                     <div className="relative">
-                        {/* Card do depoimento */}
                         <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-12 min-h-[350px] md:min-h-[320px] flex flex-col justify-between">
-                            {/* Ícones de estrelas animados */}
                             <div className="flex justify-center gap-2 mb-6">
                                 {[...Array(testimonials[currentIndex].rating)].map((_, i) => (
                                     <div
@@ -121,7 +115,6 @@ export function Testimonials() {
                                 ))}
                             </div>
 
-                            {/* Conteúdo do depoimento */}
                             <div className={`transition-all duration-500 ${
                                 isAnimating ? 'opacity-0 translate-y-4' : 'opacity-100 translate-y-0'
                             }`}>
@@ -129,7 +122,6 @@ export function Testimonials() {
                                     &ldquo;{testimonials[currentIndex].content}&rdquo;
                                 </p>
 
-                                {/* Informações do autor */}
                                 <div className="flex flex-col items-center gap-3">
                                     <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center shadow-lg">
                                         <span className="text-white text-2xl font-bold">
@@ -152,7 +144,6 @@ export function Testimonials() {
                             </div>
                         </div>
 
-                        {/* Botões de navegação - Desktop */}
                         <button
                             onClick={prevSlide}
                             className="hidden md:flex absolute top-1/2 -left-6 -translate-y-1/2 bg-white hover:bg-indigo-50 text-indigo-600 w-12 h-12 rounded-full shadow-lg items-center justify-center transition-all duration-300 hover:scale-110"
@@ -170,7 +161,6 @@ export function Testimonials() {
                         </button>
                     </div>
 
-                    {/* Indicadores de navegação */}
                     <div className="flex justify-center gap-3 mt-8">
                         {testimonials.map((_, index) => (
                             <button
@@ -186,7 +176,6 @@ export function Testimonials() {
                         ))}
                     </div>
 
-                    {/* Botões de navegação - Mobile */}
                     <div className="flex md:hidden justify-center gap-4 mt-6">
                         <button
                             onClick={prevSlide}

@@ -5,8 +5,6 @@ export function Hero(){
         <section className="bg-white overflow-hidden mt-20 md:mt-24">
             <div className="container mx-auto px-4 py-12 md:py-20 lg:py-28">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
-
-                    {/* Conteúdo de texto - Lado esquerdo */}
                     <div className="space-y-6 lg:space-y-8 text-center lg:text-left order-2 lg:order-1">
                         <div className="space-y-4">
                             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-zinc-800 leading-tight">
@@ -24,10 +22,8 @@ export function Hero(){
                         </div>
                     </div>
 
-                    {/* Imagem e cards flutuantes - Lado direito */}
                     <div className="relative order-1 lg:order-2 px-6 md:px-0">
                         <div className="relative max-w-lg mx-auto">
-                            {/* Imagem principal */}
                             <div className="rounded-3xl overflow-hidden shadow-2xl relative z-10">
                                 <img
                                     src="/professor.jpg"
@@ -36,7 +32,6 @@ export function Hero(){
                                 />
                             </div>
 
-                            {/* Card 1 - Mais controle e gestão (topo direito) */}
                             <div className="absolute -top-4 -right-4 md:-right-8 lg:-right-12 z-20
                                           bg-white rounded-2xl shadow-2xl p-4 md:p-5
                                           border-2 border-indigo-100 backdrop-blur-sm
@@ -54,7 +49,6 @@ export function Hero(){
                                 </div>
                             </div>
 
-                            {/* Card 2 - Aplicando esforço nos pontos certos (base esquerda) */}
                             <div className="absolute -bottom-6 -left-4 md:-left-8 lg:-left-12 z-20
                                           bg-white rounded-2xl shadow-2xl p-4 md:p-5
                                           border-2 border-indigo-100 backdrop-blur-sm
@@ -72,7 +66,6 @@ export function Hero(){
                                 </div>
                             </div>
 
-                            {/* Elemento decorativo - círculo gradiente */}
                             <div className="absolute -bottom-8 -right-8 w-32 h-32 md:w-40 md:h-40
                                           bg-gradient-to-br from-indigo-200/40 to-indigo-300/40
                                           rounded-full blur-3xl -z-10"></div>

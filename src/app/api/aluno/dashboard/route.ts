@@ -3,7 +3,6 @@ import { withAluno } from "@/lib/auth-helper";
 import prisma from "@/lib/prisma";
 import { TipoProva } from "@/generated/prisma";
 
-// GET /api/aluno/dashboard - Dashboard do aluno
 export const GET = withAluno(async (
   _request: NextRequest,
   _userId: string,
@@ -30,7 +29,7 @@ export const GET = withAluno(async (
         prova: {
           publicada: true,
         },
-        simuladoMateriaId: null, // Apenas notas principais (não por matéria)
+        simuladoMateriaId: null,
       },
       include: {
         prova: {
@@ -55,7 +54,7 @@ export const GET = withAluno(async (
         alunoId,
         prova:{
           publicada: true,
-          tipo: 'SIMULADO'
+          tipo: TipoProva.SIMULADO
         },
       },
     });
@@ -83,7 +82,6 @@ export const GET = withAluno(async (
       data: n.prova.data_prova,
     }));
 
-    // Buscar média da turma para comparação
     const provasPublicadas = await prisma.prova.findMany({
       where: {
         turmaId: aluno.turmaId,
@@ -100,7 +98,7 @@ export const GET = withAluno(async (
         data_prova: "asc",
       },
     });
-//falta aqui
+
     const comparacaoTurma = provasPublicadas.map((prova) => {
       const notasDaProva = prova.notas.map((n) => Number(n.valor_nota));
       const mediaTurma = notasDaProva.length > 0 ? notasDaProva.reduce((a, b) => a + b, 0) / notasDaProva.length : 0;
@@ -137,7 +135,6 @@ export const GET = withAluno(async (
     mediasAlunos.sort((a, b) => b.media - a.media);
     const posicaoTurma = mediasAlunos.findIndex((a) => a.alunoId === alunoId) + 1;
 
-    // Desempenho por matéria (apenas simulados)
     const notasSimulado = await prisma.nota.findMany({
       where: {
         alunoId,

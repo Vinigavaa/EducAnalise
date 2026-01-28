@@ -5,7 +5,6 @@ import { salvarNotasSimuladoSchema } from "@/lib/validations/nota";
 import { z } from "zod";
 import { TipoProva } from "@/generated/prisma";
 
-// POST /api/notas/simulado
 export const POST = withAuth(async (request: NextRequest, userId: string) => {
   try {
     const body = await request.json();
@@ -45,7 +44,6 @@ export const POST = withAuth(async (request: NextRequest, userId: string) => {
       }
     }
 
-    // Executar todas as operações de upsert em uma transação com timeout estendido
     await prisma.$transaction(
       async (tx) => {
         await Promise.all(

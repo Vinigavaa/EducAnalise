@@ -4,7 +4,6 @@ import prisma from "@/lib/prisma";
 import { salvarNotasSchema } from "@/lib/validations/nota";
 import { z } from "zod";
 
-// POST /api/notas - Salvar notas de uma prova
 export const POST = withAuth(async (request: NextRequest, userId: string) => {
   try {
     const body = await request.json();

@@ -62,10 +62,8 @@ export default function TrocarSenhaPage() {
 
       setSuccess(true);
 
-      // Atualizar a sessão para remover mustChangePassword
       await update({ mustChangePassword: false });
 
-      // Redirecionar para o dashboard após 2 segundos
       setTimeout(() => {
         router.push("/aluno/dashboard");
       }, 2000);

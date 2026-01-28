@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { withProfessor } from "@/lib/auth-helper";
 import prisma from "@/lib/prisma";
 
-// POST /api/provas/[id]/publicar - Publicar uma prova
 export const POST = withProfessor(async (
   _request: NextRequest,
   userId: string,
@@ -52,7 +51,6 @@ export const POST = withProfessor(async (
   }
 });
 
-// DELETE /api/provas/[id]/publicar - Despublicar uma prova
 export const DELETE = withProfessor(async (
   _request: NextRequest,
   userId: string,

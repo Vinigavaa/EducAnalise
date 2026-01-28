@@ -4,7 +4,6 @@ import prisma from "@/lib/prisma";
 import { createTurmaSchema } from "@/lib/validations/turma";
 import { z } from "zod";
 
-// GET /api/turmas - Listar todas as turmas do usuário autenticado
 export const GET = withAuth(async (_request: NextRequest, userId: string) => {
   try {
     const turmas = await prisma.turma.findMany({
@@ -33,12 +32,10 @@ export const GET = withAuth(async (_request: NextRequest, userId: string) => {
   }
 });
 
-// POST /api/turmas - Criar nova turma
 export const POST = withAuth(async (request: NextRequest, userId: string) => {
   try {
     const body = await request.json();
 
-    // Validar dados com Zod
     const validatedData = createTurmaSchema.parse(body);
 
     const novaTurma = await prisma.turma.create({

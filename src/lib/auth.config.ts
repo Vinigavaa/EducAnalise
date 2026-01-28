@@ -17,6 +17,12 @@ export const authConfig: NextAuthConfig = {
     authorized({ auth, request: { nextUrl } }) {
       const isLoggedIn = !!auth?.user;
       const pathname = nextUrl.pathname;
+      const userRole = auth?.user?.role;
+
+      // Se aluno acessar a página inicial, redirecionar para o dashboard do aluno
+      if (pathname === "/" && isLoggedIn && userRole === "ALUNO") {
+        return Response.redirect(new URL("/aluno/dashboard", nextUrl));
+      }
 
       const publicRoutes = ["/", "/login", "/api/auth"];
       const isPublicRoute = publicRoutes.some(
@@ -28,10 +34,10 @@ export const authConfig: NextAuthConfig = {
       }
 
       if (!isLoggedIn) {
-        return false; // Redireciona para login
+        // Redireciona para login quando não autorizado
+        return Response.redirect(new URL("/login", nextUrl));
       }
 
-      const userRole = auth.user.role;
       const mustChangePassword = auth.user.mustChangePassword;
 
       const isAlunoRoute = pathname.startsWith("/aluno");

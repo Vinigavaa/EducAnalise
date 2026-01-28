@@ -5,7 +5,6 @@ import { provaSchema } from "@/lib/validations/prova";
 import { z } from "zod";
 import { TipoProva } from "@/generated/prisma";
 
-// GET /api/provas/[id] - Buscar uma prova específica
 export const GET = withAuth(async (
   _request: NextRequest,
   userId: string,
@@ -93,7 +92,6 @@ export const GET = withAuth(async (
   }
 });
 
-// PUT /api/provas/[id] - Atualizar uma prova
 export const PUT = withAuth(async (
   request: NextRequest,
   userId: string,
@@ -101,7 +99,6 @@ export const PUT = withAuth(async (
 ) => {
   const params = await props.params;
   try {
-    // Verificar se a prova existe e pertence a uma turma do usuário
     const provaExistente = await prisma.prova.findFirst({
       where: {
         id: params.id,
@@ -120,15 +117,12 @@ export const PUT = withAuth(async (
 
     const body = await request.json();
 
-    // Converter data_prova se for string
     if (body.data_prova && typeof body.data_prova === 'string') {
       body.data_prova = new Date(body.data_prova);
     }
 
-    // Validar dados com Zod
     const validatedData = provaSchema.partial().parse(body);
 
-    // Se turmaId for fornecido, verificar se a nova turma pertence ao usuário
     if (validatedData.turmaId) {
       const turma = await prisma.turma.findFirst({
         where: {
@@ -145,7 +139,6 @@ export const PUT = withAuth(async (
       }
     }
 
-    // Validar matérias para simulado
     if (validatedData.tipo === TipoProva.SIMULADO) {
       if (!validatedData.materias || validatedData.materias.length === 0) {
         return NextResponse.json(
@@ -154,7 +147,6 @@ export const PUT = withAuth(async (
         );
       }
 
-      // Verificar se todas as matérias existem e pertencem ao usuário
       const materiasIds = validatedData.materias.map((m) => m.materiaId);
       const materiasExistentes = await prisma.materia.findMany({
         where: {
@@ -171,16 +163,12 @@ export const PUT = withAuth(async (
       }
     }
 
-    // Usar transação para atualizar prova e matérias do simulado
     const provaAtualizada = await prisma.$transaction(async (tx) => {
-      // Se for simulado e tem matérias, atualizar as matérias
       if (validatedData.tipo === TipoProva.SIMULADO && validatedData.materias) {
-        // Deletar matérias antigas
         await tx.simuladoMateria.deleteMany({
           where: { provaId: params.id },
         });
 
-        // Criar novas matérias
         await tx.simuladoMateria.createMany({
           data: validatedData.materias.map((m) => ({
             provaId: params.id,
@@ -190,14 +178,12 @@ export const PUT = withAuth(async (
         });
       }
 
-      // Se mudou de simulado para comum, deletar matérias
       if (validatedData.tipo === TipoProva.COMUM && provaExistente.tipo === TipoProva.SIMULADO) {
         await tx.simuladoMateria.deleteMany({
           where: { provaId: params.id },
         });
       }
 
-      // Atualizar a prova
       return tx.prova.update({
         where: {
           id: params.id,
@@ -254,7 +240,6 @@ export const PUT = withAuth(async (
   }
 });
 
-// DELETE /api/provas/[id] - Excluir uma prova
 export const DELETE = withAuth(async (
   _request: NextRequest,
   userId: string,
@@ -262,7 +247,6 @@ export const DELETE = withAuth(async (
 ) => {
   const params = await props.params;
   try {
-    // Verificar se a prova existe e pertence a uma turma do usuário
     const provaExistente = await prisma.prova.findFirst({
       where: {
         id: params.id,
@@ -286,23 +270,19 @@ export const DELETE = withAuth(async (
       );
     }
 
-    // Excluir a prova e suas dependências em uma transação
     await prisma.$transaction(async (tx) => {
-      // Primeiro, excluir as notas vinculadas
       await tx.nota.deleteMany({
         where: {
           provaId: params.id,
         },
       });
 
-      // Depois, excluir os simuladoMaterias (se houver)
       await tx.simuladoMateria.deleteMany({
         where: {
           provaId: params.id,
         },
       });
 
-      // Por fim, excluir a prova
       await tx.prova.delete({
         where: {
           id: params.id,

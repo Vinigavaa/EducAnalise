@@ -65,10 +65,8 @@ export default async function ProvaNotasPage({ params }: ProvaNotasProps) {
 
     const isSimulado = prova.tipo === TipoProva.SIMULADO;
 
-    // Mapear alunos com suas notas
     const alunosComNotas = prova.turma.alunos.map(aluno => {
         if (isSimulado) {
-            // Para simulado, mapear notas por matéria
             const notasPorMateria: Record<string, number> = {};
             prova.notas
                 .filter(n => n.alunoId === aluno.id && n.simuladoMateriaId)
@@ -84,7 +82,6 @@ export default async function ProvaNotasPage({ params }: ProvaNotasProps) {
                 notasPorMateria,
             };
         } else {
-            // Para prova comum, buscar nota única
             const notaExistente = prova.notas.find(n => n.alunoId === aluno.id && !n.simuladoMateriaId);
             return {
                 id: aluno.id,
@@ -96,7 +93,6 @@ export default async function ProvaNotasPage({ params }: ProvaNotasProps) {
 
     const pesoProva = prova.peso.toNumber();
 
-    // Mapear matérias do simulado
     const simuladoMaterias = prova.simuladoMaterias.map(sm => ({
         id: sm.id,
         materiaId: sm.materiaId,

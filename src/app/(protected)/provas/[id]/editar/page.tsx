@@ -40,7 +40,6 @@ export default async function EditarProvaPage({ params }: EditarProvaPageProps) 
     redirect("/provas");
   }
 
-  // Converter Decimal para number
   const provaFormatted = {
     ...prova,
     peso: Number(prova.peso),

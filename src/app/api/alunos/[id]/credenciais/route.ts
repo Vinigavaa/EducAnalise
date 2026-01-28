@@ -25,7 +25,6 @@ function generateUsername(nomeAluno: string, turmaId: string): string {
   return `${nomeNormalizado}.${sufixo}`;
 }
 
-// GET /api/alunos/[id]/credenciais - Verificar se aluno tem credenciais
 export const GET = withProfessor(async (
   _request: NextRequest,
   userId: string,
@@ -83,7 +82,6 @@ export const GET = withProfessor(async (
   }
 });
 
-// POST /api/alunos/[id]/credenciais - Criar credenciais para aluno
 export const POST = withProfessor(async (
   _request: NextRequest,
   userId: string,
@@ -122,7 +120,6 @@ export const POST = withProfessor(async (
     const tempPassword = generatePassword(8);
     const passwordHash = await bcrypt.hash(tempPassword, 10);
 
-    // Verificar se username já existe
     const existingUsername = await prisma.alunoCredential.findUnique({
       where: { username },
     });
@@ -131,7 +128,6 @@ export const POST = withProfessor(async (
       ? `${username}${Math.floor(Math.random() * 1000)}`
       : username;
 
-    // Criar User e AlunoCredential em uma transação
     const result = await prisma.$transaction(async (tx) => {
       const newUser = await tx.users.create({
         data: {
@@ -167,7 +163,6 @@ export const POST = withProfessor(async (
   }
 });
 
-// DELETE /api/alunos/[id]/credenciais - Remover credenciais do aluno
 export const DELETE = withProfessor(async (
   _request: NextRequest,
   userId: string,
@@ -201,7 +196,6 @@ export const DELETE = withProfessor(async (
       );
     }
 
-    // Deletar User (cascade deleta AlunoCredential)
     await prisma.users.delete({
       where: { id: aluno.userAccount.id },
     });
@@ -218,7 +212,6 @@ export const DELETE = withProfessor(async (
   }
 });
 
-// PATCH /api/alunos/[id]/credenciais - Resetar senha do aluno
 export const PATCH = withProfessor(async (
   _request: NextRequest,
   userId: string,

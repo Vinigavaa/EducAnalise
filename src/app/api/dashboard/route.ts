@@ -3,7 +3,6 @@ import { withAuth } from "@/lib/auth-helper";
 import prisma from "@/lib/prisma";
 import { TipoProva } from "@/generated/prisma";
 
-// GET /api/dashboard?turmaId=X&provaId=Y - Buscar dados do dashboard
 export const GET = withAuth(async (request: NextRequest, userId: string) => {
   try {
     const { searchParams } = new URL(request.url);
@@ -17,7 +16,6 @@ export const GET = withAuth(async (request: NextRequest, userId: string) => {
       );
     }
 
-    // Verificar se a turma pertence ao usuário
     const turma = await prisma.turma.findFirst({
       where: { id: turmaId, userId },
     });
@@ -29,7 +27,6 @@ export const GET = withAuth(async (request: NextRequest, userId: string) => {
       );
     }
 
-    // Buscar a prova selecionada com notas
     const prova = await prisma.prova.findFirst({
       where: { id: provaId, turmaId },
       include: {
@@ -63,11 +60,9 @@ export const GET = withAuth(async (request: NextRequest, userId: string) => {
       );
     }
 
-    // Calcular notas por aluno
     let notasPorAluno: { alunoId: string; nome: string; nota: number }[] = [];
 
     if (prova.tipo === TipoProva.SIMULADO) {
-      // Para simulado, calcular média ponderada das matérias por aluno
       const alunosMap = new Map<string, { nome: string; somaNotas: number; somaPesos: number }>();
 
       for (const sm of prova.simuladoMaterias) {
@@ -93,7 +88,6 @@ export const GET = withAuth(async (request: NextRequest, userId: string) => {
         nota: data.somaPesos > 0 ? Number((data.somaNotas / data.somaPesos).toFixed(2)) : 0,
       }));
     } else {
-      // Prova comum
       notasPorAluno = prova.notas.map((nota) => ({
         alunoId: nota.alunoId,
         nome: nota.aluno.nome,
@@ -101,7 +95,6 @@ export const GET = withAuth(async (request: NextRequest, userId: string) => {
       }));
     }
 
-    // Calcular média geral
     const mediaGeral =
       notasPorAluno.length > 0
         ? Number(
@@ -109,23 +102,19 @@ export const GET = withAuth(async (request: NextRequest, userId: string) => {
           )
         : 0;
 
-    // Encontrar aluno com maior nota
     const alunoMaiorNota =
       notasPorAluno.length > 0
         ? notasPorAluno.reduce((max, n) => (n.nota > max.nota ? n : max), notasPorAluno[0])
         : null;
 
-    // Calcular porcentagem de melhora comparado à prova anterior
     let porcentagemMelhora: number | null = null;
     let provaAnteriorNome: string | null = null;
 
-    // Buscar prova anterior da mesma turma e do mesmo tipo (por data da prova ou criação)
-    // Provas comuns só comparam com provas comuns, simulados só comparam com simulados
     const provaAnterior = await prisma.prova.findFirst({
       where: {
         turmaId,
         id: { not: provaId },
-        tipo: prova.tipo, // Filtrar pelo mesmo tipo de prova
+        tipo: prova.tipo,
         ...(prova.data_prova
           ? { data_prova: { lt: prova.data_prova } }
           : { criado_em: { lt: prova.criado_em } }),
@@ -182,7 +171,6 @@ export const GET = withAuth(async (request: NextRequest, userId: string) => {
       }
     }
 
-    // Calcular acertos por matéria (para simulados)
     let materiasPorAcertos: { materiaId: string; nome: string; mediaAcertos: number }[] = [];
 
     if (prova.tipo === TipoProva.SIMULADO) {
@@ -199,7 +187,6 @@ export const GET = withAuth(async (request: NextRequest, userId: string) => {
         };
       });
 
-      // Ordenar por média de acertos (maior para menor)
       materiasPorAcertos.sort((a, b) => b.mediaAcertos - a.mediaAcertos);
     }
 

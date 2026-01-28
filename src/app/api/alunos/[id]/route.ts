@@ -4,7 +4,6 @@ import prisma from "@/lib/prisma";
 import { updateAlunoSchema } from "@/lib/validations/aluno";
 import { z } from "zod";
 
-// GET /api/alunos/[id] - Buscar um aluno específico
 export const GET = withAuth(async (
   _request: NextRequest,
   userId: string,
@@ -71,7 +70,6 @@ export const GET = withAuth(async (
   }
 });
 
-// PUT /api/alunos/[id] - Atualizar um aluno
 export const PUT = withAuth(async (
   request: NextRequest,
   userId: string,
@@ -79,7 +77,6 @@ export const PUT = withAuth(async (
 ) => {
   const params = await props.params;
   try {
-    // Verificar se o aluno existe e pertence a uma turma do usuário
     const alunoExistente = await prisma.aluno.findFirst({
       where: {
         id: params.id,
@@ -98,7 +95,6 @@ export const PUT = withAuth(async (
 
     const body = await request.json();
 
-    // Validar dados com Zod
     const validatedData = updateAlunoSchema.parse(body);
 
     const alunoAtualizado = await prisma.aluno.update({
@@ -136,7 +132,6 @@ export const PUT = withAuth(async (
   }
 });
 
-// DELETE /api/alunos/[id] - Excluir um aluno
 export const DELETE = withAuth(async (
   _request: NextRequest,
   userId: string,
@@ -144,7 +139,6 @@ export const DELETE = withAuth(async (
 ) => {
   const params = await props.params;
   try {
-    // Verificar se o aluno existe e pertence a uma turma do usuário
     const alunoExistente = await prisma.aluno.findFirst({
       where: {
         id: params.id,
@@ -161,7 +155,6 @@ export const DELETE = withAuth(async (
       );
     }
 
-    // Excluir o aluno
     await prisma.aluno.delete({
       where: {
         id: params.id,

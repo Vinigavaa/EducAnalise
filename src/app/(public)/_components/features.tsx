@@ -34,8 +34,6 @@ export function Features() {
             <div className="container mx-auto px-4">
                 <div className="bg-indigo-50 rounded-3xl p-8 md:p-12 lg:p-16">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-
-                        {/* Conteúdo de texto - Lado esquerdo */}
                         <div className="space-y-8 order-1">
                             <div className="space-y-4">
                                 <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-zinc-800 leading-tight">
@@ -46,7 +44,6 @@ export function Features() {
                                 </p>
                             </div>
 
-                            {/* Lista de vantagens */}
                             <div className="space-y-6">
                                 {features.map((feature, index) => {
                                     const Icon = feature.icon
@@ -72,10 +69,8 @@ export function Features() {
                             </div>
                         </div>
 
-                        {/* Imagem/Mockup - Lado direito */}
                         <div className="order-2 relative">
                             <div className="relative">
-                                {/* Mockup principal */}
                                 <div className="rounded-2xl overflow-hidden shadow-2xl bg-white">
                                     <img
                                         src="/features.jpg"
@@ -84,7 +79,6 @@ export function Features() {
                                     />
                                 </div>
 
-                                {/* Elemento decorativo - círculo gradiente */}
                                 <div className="absolute -bottom-8 -right-8 w-40 h-40 md:w-48 md:h-48
                                               bg-gradient-to-br from-indigo-300/50 to-indigo-400/50
                                               rounded-full blur-3xl -z-10"></div>

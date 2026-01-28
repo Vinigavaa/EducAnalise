@@ -46,7 +46,6 @@ export default async function TurmaPage(props: TurmaPageProps) {
 
   return (
     <div className="space-y-6 pt-15">
-      {/* Header dentro do "ver detalhes" */}
       <div className="flex items-start justify-between">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
@@ -83,7 +82,6 @@ export default async function TurmaPage(props: TurmaPageProps) {
         </div>
       </div>
 
-      {/* Estatísticas */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card>
           <CardHeader className="pb-3">
@@ -111,7 +109,6 @@ export default async function TurmaPage(props: TurmaPageProps) {
         </Card>
       </div>
 
-      {/* Lista de Alunos */}
       <Card>
         <CardHeader>
           <div className="flex justify-between items-center">

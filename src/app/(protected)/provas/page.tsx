@@ -38,7 +38,6 @@ export default async function ProvasPage() {
     },
   });
 
-  // Converter Decimal para number para serialização
   const provas = provasRaw.map(prova => ({
     ...prova,
     peso: Number(prova.peso),

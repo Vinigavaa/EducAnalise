@@ -67,7 +67,6 @@ export default async function AlunoDetalhesPage({ params }: AlunoDetalhesPagePro
     notFound();
   }
 
-  // Calcular média do aluno
   const notasComValor = aluno.notas.filter((n) => !n.simuladoMateriaId);
   const mediaAluno =
     notasComValor.length > 0

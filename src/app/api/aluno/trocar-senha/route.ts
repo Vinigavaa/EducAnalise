@@ -9,7 +9,6 @@ const trocarSenhaSchema = z.object({
   novaSenha: z.string().min(6, "A senha deve ter pelo menos 6 caracteres"),
 });
 
-// POST /api/aluno/trocar-senha - Trocar senha do aluno
 export const POST = withAluno(async (
   request: NextRequest,
   userId: string,
@@ -19,7 +18,6 @@ export const POST = withAluno(async (
     const body = await request.json();
     const { senhaAtual, novaSenha } = trocarSenhaSchema.parse(body);
 
-    // Buscar credenciais do aluno
     const credential = await prisma.alunoCredential.findUnique({
       where: { userId },
     });
@@ -31,7 +29,6 @@ export const POST = withAluno(async (
       );
     }
 
-    // Se não é o primeiro acesso, validar senha atual
     if (!credential.mustChangePassword) {
       if (!senhaAtual) {
         return NextResponse.json(
@@ -49,10 +46,8 @@ export const POST = withAluno(async (
       }
     }
 
-    // Hash da nova senha
     const novaSenhaHash = await bcrypt.hash(novaSenha, 10);
 
-    // Atualizar senha
     await prisma.alunoCredential.update({
       where: { userId },
       data: {

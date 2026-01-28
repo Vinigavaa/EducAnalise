@@ -4,7 +4,6 @@ import prisma from "@/lib/prisma";
 import { updateTurmaSchema } from "@/lib/validations/turma";
 import { z } from "zod";
 
-// GET /api/turmas/[id] - Buscar uma turma específica
 export const GET = withAuth(async (
   _request: NextRequest,
   userId: string,
@@ -49,7 +48,6 @@ export const GET = withAuth(async (
   }
 });
 
-// PUT /api/turmas/[id] - Atualizar uma turma
 export const PUT = withAuth(async (
   request: NextRequest,
   userId: string,
@@ -57,7 +55,6 @@ export const PUT = withAuth(async (
 ) => {
   const params = await props.params;
   try {
-    // Verificar se a turma pertence ao usuário
     const turmaExistente = await prisma.turma.findFirst({
       where: {
         id: params.id,
@@ -74,7 +71,6 @@ export const PUT = withAuth(async (
 
     const body = await request.json();
 
-    // Validar dados com Zod
     const validatedData = updateTurmaSchema.parse(body);
 
     const turmaAtualizada = await prisma.turma.update({
@@ -111,7 +107,6 @@ export const PUT = withAuth(async (
   }
 });
 
-// DELETE /api/turmas/[id] - Excluir uma turma
 export const DELETE = withAuth(async (
   _request: NextRequest,
   userId: string,
@@ -119,7 +114,6 @@ export const DELETE = withAuth(async (
 ) => {
   const params = await props.params;
   try {
-    // Verificar se a turma pertence ao usuário
     const turmaExistente = await prisma.turma.findFirst({
       where: {
         id: params.id,
@@ -141,7 +135,6 @@ export const DELETE = withAuth(async (
       );
     }
 
-    // Excluir a turma (cascade delete vai excluir os alunos vinculados)
     await prisma.turma.delete({
       where: {
         id: params.id,

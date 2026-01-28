@@ -2,7 +2,7 @@ import { withAuth } from "@/lib/auth-helper";
 import prisma from "@/lib/prisma";
 import { updateMateriaSchema } from "@/lib/validations/materia";
 import { NextRequest, NextResponse } from "next/server";
-import z from "zod";
+import { z } from "zod";
 
 export const GET = withAuth(async (_request: NextRequest, userId: string, props: {params: Promise<{id: string}>}) => {
     const params = await props.params;
@@ -56,7 +56,6 @@ export const PUT = withAuth(async (request: NextRequest, userId: string, props: 
                 id: params.id,
             },
             data: {
-                //Atualiza nome somente se existir em validatedData, Se não existir, data fica vazio ({}) e nada é alterado no banco
                 ...(validatedData.nome && {nome: validatedData.nome}),
             }
         });

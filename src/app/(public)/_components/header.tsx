@@ -3,7 +3,6 @@ import { signOut, useSession } from "next-auth/react";
 import { redirect, usePathname } from "next/navigation";
 import Link from "next/link";
 import { useState } from "react";
-import { handleRegister } from "../_actions/login";
 import { Button } from "@/components/ui/button";
 import { ChartPie, GraduationCap, Menu, Home, BookMarked, FileText, LogOut } from "lucide-react";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
@@ -15,31 +14,27 @@ export default function Header() {
     const pathname = usePathname();
     const [isOpen, setIsOpen] = useState(false);
 
-    // Nao mostrar header nas rotas de aluno ou login
     if (pathname.startsWith("/aluno") || pathname === "/login") {
         return null;
     }
 
-    // Se for aluno logado, nao mostrar este header
     if (session?.user?.role === UserRole.ALUNO) {
         return null;
     }
 
-    // Rotas públicas (sempre visíveis)
     const publicNavItems = [
         { href: "/", label: "Início", icon: Home },
     ]
 
-    // Rotas autenticadas (só aparecem quando logado)
     const authNavItems = [
         { href: "/turmas", label: "Turmas", icon: GraduationCap },
-        { href: "/dashboard", label: "Dashboard", icon: ChartPie },
+        { href: "/provas", label: "Provas", icon: BookMarked },
         { href: "/materias", label: "Matérias", icon: FileText },
+        { href: "/dashboard", label: "Dashboard", icon: ChartPie },
     ]
 
     const NavLinks = () => (
         <>
-            {/* Rotas públicas */}
             {publicNavItems.map((item) => (
                 <Button
                     key={item.href}
@@ -54,7 +49,6 @@ export default function Header() {
                 </Button>
             ))}
 
-            {/* Rotas autenticadas */}
             {session && (
                 <>
                     <div className="border-t border-zinc-200 my-2" />

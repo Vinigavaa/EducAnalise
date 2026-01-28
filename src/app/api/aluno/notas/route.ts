@@ -2,14 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { withAluno } from "@/lib/auth-helper";
 import prisma from "@/lib/prisma";
 
-// GET /api/aluno/notas - Listar notas do aluno
 export const GET = withAluno(async (
   _request: NextRequest,
   _userId: string,
   alunoId: string
 ) => {
   try {
-    // Buscar aluno
     const aluno = await prisma.aluno.findUnique({
       where: { id: alunoId },
       include: {
@@ -24,7 +22,6 @@ export const GET = withAluno(async (
       );
     }
 
-    // Buscar provas publicadas da turma do aluno
     const provasPublicadas = await prisma.prova.findMany({
       where: {
         turmaId: aluno.turmaId,
@@ -54,12 +51,9 @@ export const GET = withAluno(async (
       },
     });
 
-    // Formatar dados
     const provasComNotas = provasPublicadas.map((prova) => {
-      // Nota principal (sem matéria específica)
       const notaPrincipal = prova.notas.find((n) => !n.simuladoMateriaId);
 
-      // Notas por matéria (para simulados)
       const notasPorMateria = prova.notas
         .filter((n) => n.simuladoMateriaId)
         .map((n) => ({
@@ -80,7 +74,6 @@ export const GET = withAluno(async (
       };
     });
 
-    // Calcular estatísticas
     const notasValidas = provasComNotas
       .filter((p) => p.nota !== null)
       .map((p) => p.nota as number);

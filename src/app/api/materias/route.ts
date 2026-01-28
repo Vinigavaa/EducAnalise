@@ -2,7 +2,7 @@ import { withAuth } from "@/lib/auth-helper";
 import prisma from "@/lib/prisma";
 import { createMateriaSchema } from "@/lib/validations/materia";
 import { NextRequest, NextResponse } from "next/server";
-import z from "zod";
+import { z } from "zod";
 
 export const GET = withAuth(async (request: NextRequest, userId: string) => {
     try {
