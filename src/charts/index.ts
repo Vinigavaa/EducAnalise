@@ -1,0 +1,5 @@
+export { ChartBarDefault } from "./bar-charts"
+export { ChartRadarDefault } from "./radar-chart"
+export { LineChartEvolucao } from "./line-chart-evolucao"
+export { BarChartComparacao } from "./bar-chart-comparacao"
+export { RadarChartMaterias } from "./radar-chart-materias"

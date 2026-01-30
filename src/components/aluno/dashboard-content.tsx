@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { GraficoEvolucao } from "./line-chart";
-import { GraficoComparacaoTurma } from "./grafico-comparacao-turma";
-import { GraficoMaterias } from "./grafico-materias";
+import { LineChartEvolucao } from "@/charts/line-chart-evolucao";
+import { BarChartComparacao } from "@/charts/bar-chart-comparacao";
+import { RadarChartMaterias } from "@/charts/radar-chart-materias";
 import { TrendingUp, Award, BookOpen, Users } from "lucide-react";
 
 interface DashboardData {
@@ -25,11 +25,13 @@ interface DashboardData {
     prova: string;
     nota: number;
     data: string | null;
+    tipo: "COMUM" | "SIMULADO";
   }>;
   comparacaoTurma: Array<{
     prova: string;
     notaAluno: number | null;
     mediaTurma: number;
+    tipo: "COMUM" | "SIMULADO";
   }>;
   materias: Array<{
     materia: string;
@@ -154,50 +156,68 @@ export function DashboardContent() {
 
       {/* Gráficos */}
       <div className="grid gap-6 md:grid-cols-2">
-        <Card className="md:col-span-2">
-          <CardHeader>
-            <CardTitle>Evolucao das Notas</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {data.evolucao.length > 0 ? (
-              <GraficoEvolucao data={data.evolucao} />
-            ) : (
-              <p className="text-center text-muted-foreground py-8">
-                Nenhuma nota disponivel
-              </p>
-            )}
-          </CardContent>
-        </Card>
+        <div className="md:col-span-2">
+          {data.evolucao.length > 0 ? (
+            <LineChartEvolucao
+              data={data.evolucao}
+              title="Evolucao das Notas"
+              description="Ultimas avaliacoes realizadas (provas e simulados)"
+            />
+          ) : (
+            <Card>
+              <CardHeader>
+                <CardTitle>Evolucao das Notas</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-center text-muted-foreground py-8">
+                  Nenhuma nota disponivel
+                </p>
+              </CardContent>
+            </Card>
+          )}
+        </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Comparacao com a Turma</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {data.comparacaoTurma.length > 0 ? (
-              <GraficoComparacaoTurma data={data.comparacaoTurma} />
-            ) : (
-              <p className="text-center text-muted-foreground py-8">
-                Nenhuma nota disponivel
-              </p>
-            )}
-          </CardContent>
-        </Card>
+        <div>
+          {data.comparacaoTurma.length > 0 ? (
+            <BarChartComparacao
+              data={data.comparacaoTurma}
+              title="Comparacao com a Turma"
+              description="Seu desempenho vs media da turma"
+            />
+          ) : (
+            <Card>
+              <CardHeader>
+                <CardTitle>Comparacao com a Turma</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-center text-muted-foreground py-8">
+                  Nenhuma nota disponivel
+                </p>
+              </CardContent>
+            </Card>
+          )}
+        </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Desempenho por Materia</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {data.materias.length > 0 ? (
-              <GraficoMaterias data={data.materias} />
-            ) : (
-              <p className="text-center text-muted-foreground py-8">
-                Nenhum simulado disponivel
-              </p>
-            )}
-          </CardContent>
-        </Card>
+        <div>
+          {data.materias.length > 0 ? (
+            <RadarChartMaterias
+              data={data.materias}
+              title="Desempenho por Materia"
+              description="Media de notas nos simulados"
+            />
+          ) : (
+            <Card>
+              <CardHeader>
+                <CardTitle>Desempenho por Materia</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-center text-muted-foreground py-8">
+                  Nenhum simulado disponivel
+                </p>
+              </CardContent>
+            </Card>
+          )}
+        </div>
       </div>
     </div>
   );
