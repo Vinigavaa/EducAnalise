@@ -37,6 +37,17 @@ export const GET = withAuth(async (request: NextRequest, userId: string) => {
               ano_letivo: true,
             },
           },
+          materia: {
+            select: {
+              id: true,
+              nome: true,
+            },
+          },
+          simuladoMaterias: {
+            select: {
+              materiaId: true,
+            },
+          },
           _count: {
             select: {
               notas: true,
@@ -58,6 +69,14 @@ export const GET = withAuth(async (request: NextRequest, userId: string) => {
       include: {
         turma: {
           select: { id: true, nome: true, ano_letivo: true },
+        },
+        materia: {
+          select: { id: true, nome: true },
+        },
+        simuladoMaterias: {
+          select: {
+            materiaId: true,
+          },
         },
         _count: {
           select: {
@@ -137,6 +156,7 @@ export const POST = withAuth(async (request: NextRequest, userId: string) => {
         tipo: validatedData.tipo,
         data_prova: validatedData.data_prova,
         userId,
+        materiaId: validatedData.tipo === TipoProva.COMUM ? validatedData.materiaId : null,
         ...(validatedData.tipo === TipoProva.SIMULADO && validatedData.materias && {
           simuladoMaterias: {
             create: validatedData.materias.map((m) => ({
@@ -152,6 +172,12 @@ export const POST = withAuth(async (request: NextRequest, userId: string) => {
             id: true,
             nome: true,
             ano_letivo: true,
+          },
+        },
+        materia: {
+          select: {
+            id: true,
+            nome: true,
           },
         },
         simuladoMaterias: {

@@ -32,6 +32,8 @@ export const provaSchema = z.object({
     error: () => ({ message: "Tipo de prova inválido" }),
   }),
   data_prova: z.date().optional().nullable(),
+  // Matéria da prova comum (opcional)
+  materiaId: z.string().uuid("ID da matéria inválido").optional().nullable(),
   // Matérias do simulado (obrigatório quando tipo = SIMULADO)
   materias: z.array(simuladoMateriaSchema).optional(),
 });

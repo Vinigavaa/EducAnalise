@@ -50,6 +50,7 @@ model Materia {
   userId            String?             @map("user_id")
   user              users?              @relation(fields: [userId], references: [id])
   simuladoMaterias  SimuladoMateria[]
+  provas            Prova[]
   criado_em         DateTime            @default(now())
   atualizado_em     DateTime            @updatedAt
 
@@ -94,6 +95,8 @@ model Prova {
   data_prova        DateTime?
   userId            String?             @map("user_id")
   user              users?              @relation(fields: [userId], references: [id])
+  materiaId         String?             @map("materia_id")
+  materia           Materia?            @relation(fields: [materiaId], references: [id])
   simuladoMaterias  SimuladoMateria[]
   notas             Nota[]
   publicada         Boolean             @default(false)

@@ -44,6 +44,7 @@ interface ProvaFormProps {
         tipo: TipoProva;
         data_prova: Date | null;
         turmaId: string;
+        materiaId?: string | null;
         turma: {
             id: string;
             nome: string;
@@ -72,6 +73,7 @@ export function ProvaForm({ prova, onSuccess }: ProvaFormProps) {
     const [materiasSimulado, setMateriasSimulado] = useState<MateriaSimulado[]>([]);
     const [novaMateriaId, setNovaMateriaId] = useState<string>("");
     const [novaMateriaPeso, setNovaMateriaPeso] = useState<string>("");
+    const [materiaSelecionada, setMateriaSelecionada] = useState<string>(prova?.materiaId || "");
 
     const isEditing = !!prova;
 
@@ -190,6 +192,8 @@ export function ProvaForm({ prova, onSuccess }: ProvaFormProps) {
                 ...data,
                 // Para simulado, peso é a soma das matérias
                 peso: data.tipo === TipoProva.SIMULADO ? pesoTotalSimulado : data.peso,
+                // Incluir materiaId se for prova comum
+                materiaId: data.tipo === TipoProva.COMUM ? (materiaSelecionada || null) : null,
                 // Incluir matérias se for simulado
                 materias: data.tipo === TipoProva.SIMULADO
                     ? materiasSimulado.map((m) => ({
@@ -383,6 +387,35 @@ export function ProvaForm({ prova, onSuccess }: ProvaFormProps) {
                     </FormItem>
                 )}
                 />
+            )}
+
+            {/* Campo de matéria para prova comum */}
+            {tipoProva === TipoProva.COMUM && (
+                <FormItem>
+                    <FormLabel>Matéria da Prova</FormLabel>
+                    <Select
+                        value={materiaSelecionada}
+                        onValueChange={setMateriaSelecionada}
+                        disabled={isLoading || loadingMaterias}
+                    >
+                        <SelectTrigger>
+                            <SelectValue placeholder={loadingMaterias ? "Carregando..." : "Selecione uma matéria"} />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {materias.length === 0 && !loadingMaterias ? (
+                                <div className="p-2 text-sm text-muted-foreground">
+                                    Nenhuma matéria encontrada
+                                </div>
+                            ) : (
+                                materias.map((materia) => (
+                                    <SelectItem key={materia.id} value={materia.id}>
+                                        {materia.nome}
+                                    </SelectItem>
+                                ))
+                            )}
+                        </SelectContent>
+                    </Select>
+                </FormItem>
             )}
 
             {/* Seção de matérias para simulado */}

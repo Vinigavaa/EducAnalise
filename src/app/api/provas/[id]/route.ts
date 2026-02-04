@@ -27,6 +27,12 @@ export const GET = withAuth(async (
             ano_letivo: true,
           },
         },
+        materia: {
+          select: {
+            id: true,
+            nome: true,
+          },
+        },
         simuladoMaterias: {
           include: {
             materia: {
@@ -195,6 +201,12 @@ export const PUT = withAuth(async (
           ...(validatedData.peso !== undefined && { peso: validatedData.peso }),
           ...(validatedData.tipo && { tipo: validatedData.tipo }),
           ...(validatedData.data_prova !== undefined && { data_prova: validatedData.data_prova }),
+          // Para prova comum, atualizar materiaId; para simulado, limpar materiaId
+          ...(validatedData.tipo === TipoProva.COMUM
+            ? { materiaId: validatedData.materiaId ?? null }
+            : validatedData.tipo === TipoProva.SIMULADO
+            ? { materiaId: null }
+            : {}),
         },
         include: {
           turma: {
@@ -202,6 +214,12 @@ export const PUT = withAuth(async (
               id: true,
               nome: true,
               ano_letivo: true,
+            },
+          },
+          materia: {
+            select: {
+              id: true,
+              nome: true,
             },
           },
           simuladoMaterias: {

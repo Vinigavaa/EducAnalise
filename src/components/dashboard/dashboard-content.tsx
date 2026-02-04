@@ -18,6 +18,14 @@ interface Prova {
   tipo: "COMUM" | "SIMULADO";
   peso: number;
   data_prova: string | null;
+  materiaId?: string | null;
+  materia?: { id: string; nome: string } | null;
+  simuladoMaterias?: { materiaId: string }[];
+}
+
+interface Materia {
+  id: string;
+  nome: string;
 }
 
 interface DashboardData {
@@ -43,16 +51,35 @@ interface DashboardContentProps {
 export function DashboardContent({ turmas }: DashboardContentProps) {
   const [turmaId, setTurmaId] = useState<string>("");
   const [provaId, setProvaId] = useState<string>("");
+  const [materiaId, setMateriaId] = useState<string>("");
   const [provas, setProvas] = useState<Prova[]>([]);
+  const [materias, setMaterias] = useState<Materia[]>([]);
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(false);
   const [loadingProvas, setLoadingProvas] = useState(false);
+
+  // Buscar matérias do professor
+  useEffect(() => {
+    const fetchMaterias = async () => {
+      try {
+        const res = await fetch("/api/materias");
+        if (res.ok) {
+          const data = await res.json();
+          setMaterias(data);
+        }
+      } catch (error) {
+        console.error("Erro ao buscar matérias:", error);
+      }
+    };
+    fetchMaterias();
+  }, []);
 
   // Buscar provas quando turma mudar
   useEffect(() => {
     if (!turmaId) {
       setProvas([]);
       setProvaId("");
+      setMateriaId("");
       setDashboardData(null);
       return;
     }
@@ -79,10 +106,11 @@ export function DashboardContent({ turmas }: DashboardContentProps) {
 
     fetchProvas();
     setProvaId("");
+    setMateriaId("");
     setDashboardData(null);
   }, [turmaId]);
 
-  // Buscar dados do dashboard quando prova mudar
+  // Buscar dados do dashboard quando prova ou matéria mudar
   useEffect(() => {
     if (!turmaId || !provaId) {
       setDashboardData(null);
@@ -92,7 +120,8 @@ export function DashboardContent({ turmas }: DashboardContentProps) {
     const fetchDashboardData = async () => {
       setLoading(true);
       try {
-        const res = await fetch(`/api/dashboard?turmaId=${turmaId}&provaId=${provaId}`);
+        const url = `/api/dashboard?turmaId=${turmaId}&provaId=${provaId}${materiaId ? `&materiaId=${materiaId}` : ''}`;
+        const res = await fetch(url);
         if (res.ok) {
           const data = await res.json();
           setDashboardData(data);
@@ -105,7 +134,15 @@ export function DashboardContent({ turmas }: DashboardContentProps) {
     };
 
     fetchDashboardData();
-  }, [turmaId, provaId]);
+  }, [turmaId, provaId, materiaId]);
+
+  // Filtrar provas pela matéria selecionada
+  const provasFiltradas = materiaId
+    ? provas.filter((p) =>
+        p.materiaId === materiaId ||
+        p.simuladoMaterias?.some((sm) => sm.materiaId === materiaId)
+      )
+    : provas;
 
   return (
     <div className="space-y-6">
@@ -123,6 +160,28 @@ export function DashboardContent({ turmas }: DashboardContentProps) {
               {turmas.map((turma) => (
                 <SelectItem key={turma.id} value={turma.id}>
                   {turma.nome} ({turma.ano_letivo})
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="flex-1">
+          <label className="text-sm font-medium text-zinc-700 mb-2 block">
+            Filtrar por Matéria
+          </label>
+          <Select value={materiaId || "todas"} onValueChange={(value) => {
+            setMateriaId(value === "todas" ? "" : value);
+            setProvaId("");
+          }}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Todas as matérias" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="todas">Todas as matérias</SelectItem>
+              {materias.map((materia) => (
+                <SelectItem key={materia.id} value={materia.id}>
+                  {materia.nome}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -150,9 +209,10 @@ export function DashboardContent({ turmas }: DashboardContentProps) {
               />
             </SelectTrigger>
             <SelectContent>
-              {provas.map((prova) => (
+              {provasFiltradas.map((prova) => (
                 <SelectItem key={prova.id} value={prova.id}>
                   {prova.nome} ({prova.tipo === "SIMULADO" ? "Simulado" : "Comum"})
+                  {prova.materia && ` - ${prova.materia.nome}`}
                 </SelectItem>
               ))}
             </SelectContent>

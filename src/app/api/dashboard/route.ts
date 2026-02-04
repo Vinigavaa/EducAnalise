@@ -8,6 +8,7 @@ export const GET = withAuth(async (request: NextRequest, userId: string) => {
     const { searchParams } = new URL(request.url);
     const turmaId = searchParams.get("turmaId");
     const provaId = searchParams.get("provaId");
+    const materiaId = searchParams.get("materiaId");
 
     if (!turmaId || !provaId) {
       return NextResponse.json(
@@ -30,6 +31,7 @@ export const GET = withAuth(async (request: NextRequest, userId: string) => {
     const prova = await prisma.prova.findFirst({
       where: { id: provaId, turmaId },
       include: {
+        materia: { select: { id: true, nome: true } },
         notas: {
           include: {
             aluno: { select: { id: true, nome: true } },
@@ -115,6 +117,10 @@ export const GET = withAuth(async (request: NextRequest, userId: string) => {
         turmaId,
         id: { not: provaId },
         tipo: prova.tipo,
+        // Para provas comuns, comparar apenas com provas da mesma matéria
+        ...(prova.tipo === TipoProva.COMUM && prova.materiaId
+          ? { materiaId: prova.materiaId }
+          : {}),
         ...(prova.data_prova
           ? { data_prova: { lt: prova.data_prova } }
           : { criado_em: { lt: prova.criado_em } }),
@@ -197,6 +203,7 @@ export const GET = withAuth(async (request: NextRequest, userId: string) => {
         tipo: prova.tipo,
         peso: Number(prova.peso),
         data_prova: prova.data_prova,
+        materia: prova.materia ? { id: prova.materia.id, nome: prova.materia.nome } : null,
       },
       notasPorAluno,
       mediaGeral,
