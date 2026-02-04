@@ -266,12 +266,16 @@ export function DashboardContent({ turmas }: DashboardContentProps) {
           <GraficoBarrasNotas
             notas={dashboardData.notasPorAluno}
             pesoProva={dashboardData.prova.peso}
+            nomeProva={dashboardData.prova.nome}
           />
 
           {/* Grafico de pizza (apenas para simulados) */}
           {dashboardData.prova.tipo === "SIMULADO" &&
             dashboardData.materiasPorAcertos.length > 0 && (
-              <GraficoPizzaMaterias materias={dashboardData.materiasPorAcertos} />
+              <GraficoPizzaMaterias
+                materias={dashboardData.materiasPorAcertos}
+                nomeProva={dashboardData.prova.nome}
+              />
             )}
         </>
       ) : dashboardData ? (
